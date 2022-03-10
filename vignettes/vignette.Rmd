@@ -1,0 +1,94 @@
+---
+title: "User Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+resourse_files:
+  - vignettes/vignetteFigs
+---
+
+<!-------------------------->
+<!-------------------------->
+<!-- HTML styles items    -->
+<!-------------------------->
+<!-------------------------->
+
+<style>
+.button {
+  background-color: #555555;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+  background-color: #555555;
+  color: gold;
+}
+
+</style>
+
+<!-- ------------------------>
+<!-- ------------------------>
+# Install
+<!-- ------------------------>
+<!-- ------------------------>
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+1. Download and install:
+    - R (https://www.r-project.org/)
+    - R studio (https://www.rstudio.com/) (Optional)
+    
+    
+2. In R or R studio:
+
+```r
+install.packages("devtools")
+devtools::install_github("JGCRI/osiris")
+```
+
+Additional steps for UBUNTU from a terminal
+```
+sudo add-apt-repository ppa:ubuntugis/ppa
+sudo apt-get update
+sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libavfilter-dev  libmagick++-dev
+```
+
+Additional steps for MACOSX from a terminal
+```
+brew install pkg-config
+brew install gdal
+brew install geos
+brew install imagemagick@6
+```
+
+<!-------------------------->
+<!-------------------------->
+# Input Formats {#inputs}
+<!-------------------------->
+<!-------------------------->
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+Input details here.
+
+<!-------------------------->
+<!-------------------------->
+# Output Formats {#outputs}
+<!-------------------------->
+<!-------------------------->
+<p align="center"> <img src="vignetteFigs/divider.png"></p>
+
+```{r,  results="hide", eval=FALSE, echo=F, warning=FALSE, error = FALSE, message = FALSE}
+library(osiris);
+osiris::example_function()
+```

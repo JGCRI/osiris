@@ -1,0 +1,31 @@
+title: osiris
+
+home:
+  sidebar:
+    structure: [links, license, community, authors, dev]
+
+navbar:
+  type: inverse
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "User Guide"
+      icon: fas fa-book
+      href: articles/vignette.html
+    - icon: fa-file-code-o
+      text: "Reference"
+      href: reference/index.html
+    - icon: fa-newspaper-o
+      text: "News"
+      href: news/index.html
+    - text: "Contribute"
+      href: CONTRIBUTE.html
+    - icon: fas fa-quote-left
+      text: Citation
+      href: CITATION.html
+    - icon: fas fa-question
+      text: Support
+      href: SUPPORT.html
+      
+toc:
+  depth: 3
