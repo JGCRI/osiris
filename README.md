@@ -73,6 +73,8 @@ brew install imagemagick@6
 <!-- ------------------------>
 <!-- ------------------------>
 
-- 
+- Müller, C., Franke, J., Jägermeyr, J., Ruane, A.C., Elliott, J., Moyer, E., Heinke, J., Falloon, P.D., Folberth, C., Francois, L. and Hank, T., 2021. Exploring uncertainties in global crop yield projections in a large ensemble of crop models and CMIP5 and CMIP6 climate scenarios. Environmental Research Letters, 16(3), p.034040. https://doi.org/10.1088/1748-9326/abd8fc
+- Franke, J.A., Müller, C., Elliott, J., Ruane, A.C., Jägermeyr, J., Snyder, A., Dury, M., Falloon, P.D., Folberth, C., François, L. and Hank, T., 2020. The GGCMI Phase 2 emulators: global gridded crop model responses to changes in CO 2, temperature, water, and nitrogen (version 1.0). Geoscientific Model Development, 13(9), pp.3995-4018. https://doi.org/10.5194/gmd-13-3995-2020
+- Snyder, A., Calvin, K.V., Phillips, M. and Ruane, A.C., 2019. A crop yield change emulator for use in GCAM and similar models: Persephone v1. 0. Geoscientific Model Development, 12(4), pp.1319-1350. https://doi.org/10.5194/gmd-12-1319-2019
 
   
