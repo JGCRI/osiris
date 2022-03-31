@@ -31,12 +31,12 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/calculate_deltas_from_climate.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/osiris.html</loc>
-  </url>
-  <url>
-    <loc>/reference/test_function.html</loc>
   </url>
 </urlset>
