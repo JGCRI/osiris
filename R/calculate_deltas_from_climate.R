@@ -1,0 +1,330 @@
+#' calculate_deltas_from_climate
+#'
+#' Function to process climate data to calculate delta P and delta T.
+#'
+#' @param climate_dir Default = NULL
+#' @param write_dir Default = getwd(). Output Folder
+#' @param esm_name Default = 'CanESM5'
+#' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
+#' @param irrigation_rainfed Default = c("IRR", "RFD")
+#' @param minlat Default = -87.8638
+#' @param minlon Default = -179.75
+#' @param monthly_growing_season Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,	gslength, areamask
+#' @param monthly_harvest_season Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,	hmonth, areamask
+#' @param rollingAvgYears Default = 15
+#' @param growing_season_dir Default = NULL
+#' @keywords test
+#' @return number
+#' @importFrom rlang :=
+#' @importFrom magrittr %>%
+#' @export
+#' @examples
+#' \dontrun{
+#' library(osiris)
+#' osiris::calculate_deltas_from_climate()
+#' }
+
+calculate_deltas_from_climate <- function(climate_dir = NULL,
+                                          write_dir = getwd(),
+                                          esm_name = 'CanESM5',
+                                          crops = c("Corn", "Wheat", "Rice", "Soy"),
+                                          irrigation_rainfed = c("IRR", "RFD"),
+                                          minlat = -87.8638,
+                                          minlon = -179.75,
+                                          monthly_growing_season = NULL,
+                                          monthly_harvest_season = NULL,
+                                          rollingAvgYears = 15,
+                                          growing_season_dir = NULL) {
+
+
+
+  #.........................
+  # Initialize
+  #.........................
+
+  rlang::inform("Starting calculate_deltas_from_climate...")
+
+  # Initialize values
+  NULL -> areamask -> basePr -> baseTemp -> crop -> gslength -> hmonth ->
+    irr -> keep -> lat -> latgrid -> lon -> longrid -> month -> pmonth ->
+    time -> time_id -> time_index -> value -> year -> .
+
+  # Increase memory limits
+  utils::memory.limit(size=56000)
+
+  # Check input data
+
+
+  # Set values
+  write_dir_yield_response = paste0(write_dir,"/yield_response_outputs")
+
+
+  #.........................
+  # Custom functions
+  #.........................
+
+  # function to convert dates
+  ##TODO you'll have to adjust this depending on your calendar and units in climate data:
+  # days since 1850-01-01 00:00:00, 365 day year
+  convert_time <- function(time, reference_year, nc_start_year){
+    time %>%
+      dplyr::mutate(time_index = as.integer(row.names(.)) - 1 + 12*(nc_start_year - reference_year),
+             month = floor(time_index %% 12) + 1,
+             year = floor(time_index/ 12) + reference_year,
+             time_id = paste0(month, '~', year )) %>%
+      dplyr::select(time, time_id)
+  }
+
+  ### function to keep relevant months in growing season
+  keep_months_and_avg <- function(data,crp, irrig){
+
+    ag_practice_info %>%
+      dplyr::filter(crop == crp,
+             irr == irrig) ->
+      crop_practice_info
+    # ggplot(crop_practice_info, aes(x=longrid, y=-latgrid)) + geom_raster(aes(fill=pmonth))
+    # #^ to show that the lat/lon ordering on the growing season mask is weird, which is why
+    # #  we have to do the weird adjustments in the next block before joining.
+
+    data %>%
+      ##TODO this is definitely imperfect because the growing season grid is finer than
+      #      the climate data grid, just picking the growing season grid cell that seems
+      #      about closest to the lat/lon id of each climate grid cell
+      dplyr::mutate(lat2 = -lat, # to match the crop mask grids
+             latgrid = round(((lat2 - minlat) * 2) + 1, 0),
+             lon2 = dplyr::if_else(lon > 180, lon - 360, lon) , # to match the crop mask grids
+             longrid = round(((lon2 - minlon) * 2) + 1, 0)) %>%
+      dplyr::select(-lat2, -lon2) %>%
+      dplyr::left_join(crop_practice_info, by = c("latgrid", "longrid")) %>%
+      dplyr::filter(pmonth != 0, gslength != 0) %>%
+      dplyr::mutate(keep = dplyr::if_else(pmonth *30 + gslength < 365, # if growing season doesn't cross into new year
+                            dplyr::if_else(month >= pmonth & month <= hmonth, 1, 0), # if month is between pmonth and hmonth, keep it; otherwise dump it
+                            # now this is for planting seasons that DO cross into the new year, which means
+                            # keep if month > pmonth OR < hmonth
+                            dplyr::if_else(month >= pmonth | month <= hmonth, 1, 0))) %>%
+      dplyr::filter(keep == 1) %>%
+      dplyr::select(-keep) %>%
+      dplyr::group_by(lon, lat, latgrid, longrid, crop, irr, year) %>%
+      dplyr::summarise(value = mean(value)) %>%
+      dplyr::ungroup
+  }
+
+
+
+  #.........................
+  # Read in Growing Season Info
+  #.........................
+
+  ##TODO you'll need to track down the actual ggcmi phase 2 growing season masks,
+  ##     these are just ones I had.
+  # read in table of planting and harvesting months for each grid cell by crop, irr
+  ag_practice_info <-
+    data.table::fread(monthly_harvest_season) %>%
+    tibble::as_tibble() %>%
+    dplyr::left_join(
+      data.table::fread(monthly_growing_season) %>%
+        tibble::as_tibble() %>%
+        dplyr::select(-areamask),
+      by = c("latgrid", "longrid","crop", "irr", "pmonth")
+    )
+
+
+  #.........................
+  # Load the T and P data, process by crop-irr combos to get growing season-averaged
+  # T and P values in each year
+  #.........................
+
+  for (varname in c('tas', 'pr')){
+
+    # The names of the files you want to work with:
+    # ##TODO you'll probably have different files name structure than the example hadgem data I had
+    #        handy. It will probably look more like this commented block for `batch0`
+    batch0 <- c(paste0(climate_dir, "/", varname, "_Amon_CanESM5_historical_r1i1p1f1_orig.nc"),
+                paste0(climate_dir, "/", varname, "_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc"))
+
+
+    # load these files in memory
+
+    # The historical file so we have 1980-2010 baseline years
+    ncfile1 <- ncdf4::nc_open(batch0[1])
+    # pull off lon/lat/time info
+    lat1 <- ncdf4::ncvar_get(ncfile1,"lat")
+    lon1 <- ncdf4::ncvar_get(ncfile1,"lon")
+    time1 <- ncdf4::ncvar_get(ncfile1, "time")
+
+    # reshape and Assign them to a holder variable x so that we just have a matrix of data
+    # each row of x is a single grid cell's time series, each column is a time slice across all grids
+    x1 <- t(rbind(matrix(aperm(ncdf4::ncvar_get(ncfile1,varname),c(3,1,2)),length(time1),length(lat1)*length(lon1))))
+    colnames(x1) <- convert_time(time = data.frame(time=time1),
+                                 reference_year = 1850,
+                                 nc_start_year = 1850)$time_id
+
+    # The projection file, which starts in 2015 in CMIP6
+    ncfile2 <- ncdf4::nc_open(batch0[2])
+    # pull off lon/lat/time info
+    lat2 <- ncdf4::ncvar_get(ncfile2,"lat")
+    lon2 <- ncdf4::ncvar_get(ncfile2,"lon")
+    time2 <- ncdf4::ncvar_get(ncfile2, "time")
+
+    # reshape and Assign them to a holder variable x so that we just have a matrix of data
+    # each row of x is a single grid cell's time series, each column is a time slice across all grids
+    x2 <- t(rbind(matrix(aperm(ncdf4::ncvar_get(ncfile2,varname),c(3,1,2)),length(time2),length(lat2)*length(lon2))))
+    colnames(x2) <- convert_time(time = data.frame(time=time2),
+                                 reference_year = 1850,
+                                 nc_start_year = 2015)$time_id
+
+
+    # make one data frame with all years
+    grid <- expand.grid(list(lon=lon1,lat=lat1))
+
+    rlang::inform(paste0("Reading in and reshaping the following ncdf files and vars: "))
+    rlang::inform(paste0("ncdf file 1: ",batch0[1],", var: ", varname, "..."))
+    rlang::inform(paste0("ncdf file 2: ",batch0[2],", var: ", varname, "..."))
+
+    x <- cbind(grid, x1, x2) %>%
+      tidyr::gather(time, value, -lon, -lat) %>%
+      tidyr::separate(time, into = c('month', 'year'), sep = '~') %>%
+      dplyr::mutate(year = as.integer(year),
+             month=as.integer(month)) %>%
+      dplyr::filter(year >= 1965)
+
+    rlang::inform(paste0("Reading in and reshaping ncdf files complete."))
+
+    # pull off the climate data for each crop-irr combo
+    for(crp in crops){
+      for(irrig in irrigation_rainfed){
+
+        x %>%
+          keep_months_and_avg(., crp=crp, irrig=irrig) %>%
+          utils::write.csv(., paste0(write_dir, '/', esm_name, '_', varname,
+                              '_', crp, '_', irrig,
+                              '_growing_season_avg.csv'),
+                    row.names = F)
+
+      }
+    }
+
+  }
+
+  ###############################################################################
+  # Smooth T and P growing season average values so that we have the long term
+  # growing season average values
+  #
+  # Then, calculate changes relative to 1980-2010 so that the deltas we have
+  # are changes in long term growing season average values relative to baseline.
+  #
+  # Pretty sure the order doesn't matter for deltaT because it's additive but
+  # deltaP is multiplicative so it does matter
+  #
+  # ## NOTE:
+  # The latgrid and longrid columns are for matching up with the area masks I have.
+  # They could presumably be dropped but since the masks I have for winter and
+  # spring wheat are the same masks with the same latgrid and longrid, keep for now.
+  ###############################################################################
+
+  # Helper fcn
+  rollAvg <-  function(x,n){
+    y <- stats::filter(x,rep(1/n,n), sides=2)
+    ind <- which(is.na(y))
+
+    for(i in 1:length(ind)){
+      left <- max(1,ind[i] - (n-1) /2)
+      right <- min( max(ind), ind[i] + (n-1) /2)
+      y[ind[i]] <- mean(x[left:right])
+    }
+
+    y
+  }
+
+
+  # get deltaT, deltaP for each crop-irr combo
+  for(crp in crops){
+    for(irrig in irrigation_rainfed){
+
+      # get the T and P growing season average files loaded for this crop-irr combo:
+      filenames <- list.files(growing_season_dir, pattern = esm_name, full.names=TRUE, recursive=FALSE)
+      filenames <- filenames[grepl(paste0(crp, '_', irrig), filenames)]
+      tas_file <- filenames[grepl('tas', filenames)]
+      pr_file <- filenames[grepl('pr', filenames)]
+
+      tas <- utils::read.csv(tas_file, stringsAsFactors = F)
+      pr <- utils::read.csv(pr_file, stringsAsFactors = F)
+
+      # long term average values
+      tas %>%
+        dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
+        dplyr::mutate(value = as.numeric(rollAvg(value, n = (2 * rollingAvgYears + 1)))) %>%
+        dplyr::ungroup ->
+        tas2
+
+      pr %>%
+        dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
+        dplyr::mutate(value = as.numeric(rollAvg(value, n = (2 * rollingAvgYears + 1)))) %>%
+        dplyr::ungroup ->
+        pr2
+
+
+      # baseline averages
+      tas2 %>%
+        dplyr::filter(year >= 1980,
+               year <= 2010) %>%
+        dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
+        dplyr::summarise(baseTemp = mean(value)) %>%
+        dplyr::ungroup ->
+        baseT
+
+      pr2 %>%
+        dplyr::filter(year >= 1980,
+               year <= 2010) %>%
+        dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
+        dplyr::summarise(basePr = mean(value)) %>%
+        dplyr::ungroup ->
+        baseP
+
+
+      # deltas:
+      tas2 %>%
+        dplyr::filter(year >= 1980) %>%
+        dplyr::left_join(baseT, by = c("lon", "lat", "latgrid", "longrid", "crop", "irr")) %>%
+        dplyr::mutate(deltaT = value - baseTemp) %>% # deltaT is additive
+        dplyr::select(-baseTemp, -value) ->
+        deltaT
+
+      pr2 %>%
+        dplyr::filter(year >= 1980) %>%
+        dplyr::left_join(baseP, by = c("lon", "lat", "latgrid", "longrid", "crop", "irr")) %>%
+        dplyr::mutate(deltaP = 1 +((value - basePr)/basePr)) %>% #deltaP is multiplicative
+        dplyr::select(-basePr, -value) ->
+        deltaP
+
+      # combine and save off:
+      deltaT %>%
+        dplyr::left_join(deltaP, by = c("lon", "lat", "latgrid", "longrid", "crop", "irr", 'year'))%>%
+        utils::write.csv(., paste0(write_dir, '/', esm_name, '_',tolower(crp), '_', tolower(irrig), '_smooth_deltaT_deltaP.csv'),
+                  row.names = F)
+
+    }
+  }
+
+  # # #######
+  # # some code for easy plotting for sanity checks if needed
+  # # #######
+  # pT <- ggplot(data = dplyr::filter(deltaT, year == 2085), aes(x = lon, y = lat)) +
+  #   geom_raster(aes(fill = deltaT)) +
+  #   theme_bw()
+  # pT
+  #
+  #
+  # pP <- ggplot(data = dplyr::filter(deltaP, year == 2085), aes(x = lon, y = lat)) +
+  #   geom_raster(aes(fill = deltaP)) +
+  #   theme_bw()
+  # pP
+
+  #.........................
+  # Close out
+  #.........................
+
+  rlang::inform("calculate_deltas_from_climate complete.")
+
+  return()
+}
