@@ -6,7 +6,7 @@
 \usage{
 calculate_deltas_from_climate(
   climate_dir = NULL,
-  write_dir = NULL,
+  write_dir = getwd(),
   esm_name = "CanESM5",
   crops = c("Corn", "Wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
@@ -21,7 +21,7 @@ calculate_deltas_from_climate(
 \arguments{
 \item{climate_dir}{Default = NULL}
 
-\item{write_dir}{Default = NULL. Output Folder}
+\item{write_dir}{Default = getwd(). Output Folder}
 
 \item{esm_name}{Default = 'CanESM5'}
 
