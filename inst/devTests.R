@@ -7,10 +7,10 @@ data_folder <- "C:/Z/models/osiris_yieldEmu4GCAM/data/"
 # Tests for calculate_deltas_from_climate
 osiris::calculate_deltas_from_climate(
   climate_dir = paste0(data_folder,"/climate_data"),
-  write_dir = getwd(),
+  write_dir = paste0(data_folder,"/yield_response_inputs"),
   esm_name = 'CanESM5',
   crops = c("Corn", "Wheat", "Rice", "Soy"),
-  irrigs = c("IRR", "RFD"),
+  irrigation_rainfed = c("IRR", "RFD"),
   minlat = -87.8638,
   minlon = -179.75,
   monthly_growing_season = paste0(data_folder,"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"),
@@ -21,7 +21,7 @@ osiris::calculate_deltas_from_climate(
 
 # For Debugging/testing
 climate_dir = paste0(data_folder,"/climate_data")
-write_dir = getwd()
+write_dir = paste0(data_folder,"/yield_response_inputs")
 esm_name = 'CanESM5'
 crops = c("Corn", "Wheat", "Rice", "Soy")
 irrigs = c("IRR", "RFD")

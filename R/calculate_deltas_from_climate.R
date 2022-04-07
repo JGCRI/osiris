@@ -3,7 +3,7 @@
 #' Function to process climate data to calculate delta P and delta T.
 #'
 #' @param climate_dir Default = NULL
-#' @param write_dir Default = getwd(). Output Folder
+#' @param write_dir Default = NULL. Output Folder
 #' @param esm_name Default = 'CanESM5'
 #' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
@@ -25,7 +25,7 @@
 #' }
 
 calculate_deltas_from_climate <- function(climate_dir = NULL,
-                                          write_dir = getwd(),
+                                          write_dir = NULL,
                                           esm_name = 'CanESM5',
                                           crops = c("Corn", "Wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
@@ -51,12 +51,6 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
   # Increase memory limits
   utils::memory.limit(size=56000)
-
-  # Check input data
-
-
-  # Set values
-  write_dir_yield_response = paste0(write_dir,"/yield_response_outputs")
 
 
   #.........................
@@ -106,7 +100,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       dplyr::select(-keep) %>%
       dplyr::group_by(lon, lat, latgrid, longrid, crop, irr, year) %>%
       dplyr::summarise(value = mean(value)) %>%
-      dplyr::ungroup
+      dplyr::ungroup()
   }
 
 
@@ -254,13 +248,13 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       tas %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::mutate(value = as.numeric(rollAvg(value, n = (2 * rollingAvgYears + 1)))) %>%
-        dplyr::ungroup ->
+        dplyr::ungroup() ->
         tas2
 
       pr %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::mutate(value = as.numeric(rollAvg(value, n = (2 * rollingAvgYears + 1)))) %>%
-        dplyr::ungroup ->
+        dplyr::ungroup() ->
         pr2
 
 
@@ -270,7 +264,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
                year <= 2010) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(baseTemp = mean(value)) %>%
-        dplyr::ungroup ->
+        dplyr::ungroup() ->
         baseT
 
       pr2 %>%
@@ -278,7 +272,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
                year <= 2010) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(basePr = mean(value)) %>%
-        dplyr::ungroup ->
+        dplyr::ungroup() ->
         baseP
 
 
