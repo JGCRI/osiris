@@ -7,12 +7,13 @@
 grid_to_basin_yield(
   carbon = NULL,
   weight_floor_ha = 1,
-  fcnpath = NULL,
-  inputpath = NULL,
-  areapath = NULL,
+  emulator_dir = NULL,
+  input_dir = NULL,
+  area_dir = NULL,
   basin_grid = NULL,
   basin_id = NULL,
-  outpath = getwd(),
+  write_dir = "outputs_grid_to_basin_yield",
+  wheat_area = NULL,
   crops = c("maize", "rice", "soy", "wheat"),
   esm_name = "CanESM5",
   cm_name = "LPJmL",
@@ -25,19 +26,21 @@ grid_to_basin_yield(
 
 \item{weight_floor_ha}{Default = 1}
 
-\item{fcnpath}{Default = NULL}
+\item{emulator_dir}{Default = NULL}
 
-\item{inputpath}{Default = NULL}
+\item{input_dir}{Default = NULL}
 
-\item{areapath}{Default = NULL}
+\item{area_dir}{Default = NULL}
 
 \item{basin_grid}{Default = NULL}
 
 \item{basin_id}{Default = NULL}
 
-\item{outpath}{Default = getwd(). Output Folder}
+\item{write_dir}{Default = "outputs_grid_to_basin_yield". Output Folder}
 
-\item{crops}{Default = c("maize", "rice", 'soy', 'wheat')}
+\item{wheat_area}{Default = NULL Spring and winter wheat areas}
+
+\item{crops}{Default = c("maize", "rice", "soy", "wheat")}
 
 \item{esm_name}{Default = 'CanESM5'}
 
