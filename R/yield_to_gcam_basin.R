@@ -5,10 +5,10 @@
 #'
 #' @param write_dir Default = "outputs_yield_to_gcam_basin". Output Folder
 #' @param emulated_basin_yield_dir Default = NULL
-#' @param iso_GCAM_regID Default = NULL
-#' @param FAO_ag_items_PRODSTAT Default = NULL
-#' @param L100.LDS_ag_HA_ha Default = NULL
-#' @param iso_GCAM_basinID Default = NULL
+#' @param iso_GCAM_region_mapping Default = NULL
+#' @param FAO_ag_mapping Default = NULL
+#' @param iso_harvest_area_mapping Default = NULL
+#' @param iso_GCAM_basin_mapping Default = NULL
 #' @param max_CCImult Default = 2.5 Upper limit on positive climate impacts (multiplier)
 #' @param min_CCImult Default = 0.01 Lower limit on negative climate impacts (multiplier)
 #' @param weight_floor_ha Default = 1 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units.
@@ -29,10 +29,10 @@
 
 yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
                                 emulated_basin_yield_dir = NULL,
-                                iso_GCAM_regID = NULL,
-                                FAO_ag_items_PRODSTAT = NULL,
-                                L100.LDS_ag_HA_ha = NULL,
-                                iso_GCAM_basinID = NULL,
+                                iso_GCAM_region_mapping = NULL,
+                                FAO_ag_mapping = NULL,
+                                iso_harvest_area_mapping = NULL,
+                                iso_GCAM_basin_mapping = NULL,
                                 max_CCImult = 2.5,
                                 min_CCImult = 0.01,
                                 weight_floor_ha = 1,
@@ -108,28 +108,33 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   # Read in Mapping Data Files
   #.........................
 
+  iso_GCAM_regID <- tibble::as_tibble(utils::read.csv(file=iso_GCAM_region_mapping,head = TRUE, comment.char = "#", sep = ",") )
+  FAO_ag_items_PRODSTAT <- tibble::as_tibble(utils::read.csv(file=FAO_ag_mapping,head = TRUE, sep = ",") )
+  L100.LDS_ag_HA_ha <- tibble::as_tibble(utils::read.csv(file=iso_harvest_area_mapping,head = TRUE, sep = ",", comment.char = "#") )
+  iso_GCAM_basinID <- tibble::as_tibble(utils::read.csv(file=iso_GCAM_basin_mapping,head = TRUE, sep = ",") )
+
   # correct abbreviations
-  tibble::as_tibble(utils::read.csv(file=FAO_ag_items_PRODSTAT, head = TRUE, sep = ",")) %>%
+  FAO_ag_items_PRODSTAT %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::select(GTAP_crop, GCAM_commodity, lpjml_crop, epic_crop, gepic_crop, image_crop, lpjguess_crop, pdssat_crop, pegasus_crop) ->
     crops_gtap_gcam_allCMs
 
-  tibble::as_tibble(utils::read.csv(file=FAO_ag_items_PRODSTAT, head = TRUE, sep = ",")) %>%
+  FAO_ag_items_PRODSTAT %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::select(AgMIPAbbrev, C3avg_incl) %>%
     dplyr::rename(cropname = AgMIPAbbrev)->
     crops_masterlist_c3avgincl
 
   # switch factors to characters for remaining inputs
-  tibble::as_tibble(utils::read.csv(file=iso_GCAM_regID, head = TRUE, comment.char = "#", sep = ",")) %>%
+  iso_GCAM_regID %>%
     dplyr::mutate_if(is.factor, as.character) ->
     iso_GCAM_regID
 
-  tibble::as_tibble(utils::read.csv(file=L100.LDS_ag_HA_ha, head = TRUE, sep = ",", comment.char = "#")) %>%
+  L100.LDS_ag_HA_ha %>%
     dplyr::mutate_if(is.factor, as.character) ->
     L100.LDS_ag_HA_ha
 
-  tibble::as_tibble(utils::read.csv(file=iso_GCAM_basinID, head = TRUE, sep = ",")) %>%
+  iso_GCAM_basinID %>%
     dplyr::mutate_if(is.factor, as.character) ->
     iso_GCAM_basinID
 
@@ -312,7 +317,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::rename(maximp = impact) ->
     ag_tmp1
 
-  # Join that to the table of outliers, and repalce the outlier years
+  # Join that to the table of outliers, and replace the outlier years
   ag_tmp %>%
     dplyr::left_join(ag_tmp1, by = c("rcp", "gcm", "cropmodel", "GCAM_region_ID", "GLU", "GLU_name", "GCAM_commodity", "irr"))  %>%
     dplyr::mutate(impact = dplyr::if_else(outlier == TRUE, maximp, impact)) %>%
@@ -329,7 +334,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::ungroup() %>%
     dplyr::select(-GCAM_commodity) %>%
     dplyr::group_by(rcp, gcm, cropmodel, irr, GLU, GLU_name, GCAM_region_ID, year) %>%
-    dplyr::summarise_if(is.numeric, median) %>%
+    dplyr::summarise_if(is.numeric, stats::median) %>%
     dplyr::mutate(GCAM_commodity = "biomass") ->
     bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears
 
@@ -339,8 +344,8 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
 
 
   # write
-  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/gcam_basin_crops_impact_multipliers/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
-  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/gcam_basin_crops_impact_multipliers/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
 
 
   rlang::inform("yield_to_gcam_basin complete.")

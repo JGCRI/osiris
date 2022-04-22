@@ -7,10 +7,10 @@
 yield_to_gcam_basin(
   write_dir = "outputs_yield_to_gcam_basin",
   emulated_basin_yield_dir = NULL,
-  iso_GCAM_regID = NULL,
-  FAO_ag_items_PRODSTAT = NULL,
-  L100.LDS_ag_HA_ha = NULL,
-  iso_GCAM_basinID = NULL,
+  iso_GCAM_region_mapping = NULL,
+  FAO_ag_mapping = NULL,
+  iso_harvest_area_mapping = NULL,
+  iso_GCAM_basin_mapping = NULL,
   max_CCImult = 2.5,
   min_CCImult = 0.01,
   weight_floor_ha = 1,
@@ -25,13 +25,13 @@ yield_to_gcam_basin(
 
 \item{emulated_basin_yield_dir}{Default = NULL}
 
-\item{iso_GCAM_regID}{Default = NULL}
+\item{iso_GCAM_region_mapping}{Default = NULL}
 
-\item{FAO_ag_items_PRODSTAT}{Default = NULL}
+\item{FAO_ag_mapping}{Default = NULL}
 
-\item{L100.LDS_ag_HA_ha}{Default = NULL}
+\item{iso_harvest_area_mapping}{Default = NULL}
 
-\item{iso_GCAM_basinID}{Default = NULL}
+\item{iso_GCAM_basin_mapping}{Default = NULL}
 
 \item{max_CCImult}{Default = 2.5 Upper limit on positive climate impacts (multiplier)}
 
