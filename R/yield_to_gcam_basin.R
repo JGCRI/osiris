@@ -14,8 +14,8 @@
 #' @param weight_floor_ha Default = 1 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units.
 #' @param rolling_avg_years Default = 15 Set the number of years to define the range for rolling averages (range = 2 times this plus 1)
 #' @param maxHistYear Default = 2010 Historical year for which to apply rolling averages
-#' @param baseYear Default = 2015 Base year for which to apply rolling averages
-#' @param maxFutYear Default = 2100 Future year for which to apply rolling averages
+#' @param minFutYear Default = 2015 Min future year for which to apply rolling averages
+#' @param maxFutYear Default = 2100 Max future year for which to apply rolling averages
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -38,7 +38,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
                                 weight_floor_ha = 1,
                                 rolling_avg_years = 15,
                                 maxHistYear = 2010,
-                                baseYear = 2015,
+                                minFutYear = 2015,
                                 maxFutYear = 2100) {
 
 
@@ -204,7 +204,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::left_join(emu_yield_HA_base_glu_irr_isicrop,
                      by = c("ID", "weight","rcp", "gcm", "cropmodel","crop", "irr")) %>%
     # "dropping irrelevant columns" - mostly done already, just restrict down to every 5 years in future
-    dplyr::filter(year %in% seq(baseYear, maxFutYear, 5)) %>%
+    dplyr::filter(year %in% seq(minFutYear, maxFutYear, 5)) %>%
     # calculate the multipliers/impacts by doing Value/base for each year
     dplyr::group_by(ID, weight, rcp, gcm, cropmodel,crop, irr) %>%
     dplyr::mutate(impact = yield/base,

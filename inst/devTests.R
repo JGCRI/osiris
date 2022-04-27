@@ -65,6 +65,6 @@ osiris::yield_to_gcam_basin(
   weight_floor_ha = 1,
   rolling_avg_years = 15,
   maxHistYear = 2010,
-  baseYear = 2015,
+  minFutYear = 2015,
   maxFutYear = 2100
 )

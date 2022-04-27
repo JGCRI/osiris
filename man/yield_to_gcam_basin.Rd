@@ -16,7 +16,7 @@ yield_to_gcam_basin(
   weight_floor_ha = 1,
   rolling_avg_years = 15,
   maxHistYear = 2010,
-  baseYear = 2015,
+  minFutYear = 2015,
   maxFutYear = 2100
 )
 }
@@ -43,9 +43,9 @@ yield_to_gcam_basin(
 
 \item{maxHistYear}{Default = 2010 Historical year for which to apply rolling averages}
 
-\item{baseYear}{Default = 2015 Base year for which to apply rolling averages}
+\item{minFutYear}{Default = 2015 Min future year for which to apply rolling averages}
 
-\item{maxFutYear}{Default = 2100 Future year for which to apply rolling averages}
+\item{maxFutYear}{Default = 2100 Max future year for which to apply rolling averages}
 }
 \value{
 number
