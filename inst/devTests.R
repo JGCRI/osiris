@@ -68,3 +68,19 @@ osiris::yield_to_gcam_basin(
   minFutYear = 2015,
   maxFutYear = 2100
 )
+
+
+# Tests for create_AgProdChange_xml
+osiris::create_AgProdChange_xml(
+  write_dir = paste0(data_folder,"/outputs_create_AgProdChange_xml"),
+  ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_ag_irr_ref.csv"),
+  bio_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"),
+  ag_impacts = paste0(data_folder,"/gcam_basin_crops_impact_multipliers/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  bio_impacts = paste0(data_folder,"/gcam_basin_crops_impact_multipliers/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  GCAM_region_mapping = paste0(data_folder,"/mapping_data/GCAM_region_names.csv"),
+  timestep = 5,
+  maxHistYear = 2010,
+  minFutYear = 2015,
+  appliedto = "full"
+)
+
