@@ -2,7 +2,7 @@
 library(osiris); library(dplyr);library(tibble);library(ncdf4);library(rlang); library(data.table)
 
 # Change data folder
-data_folder <- "C:/Z/models/osiris_yieldEmu4GCAM/data"
+data_folder <- "C:/Users/ahsa361/Documents/yieldEmu4GCAM/data"
 
 # Tests for calculate_deltas_from_climate
 osiris::calculate_deltas_from_climate(
@@ -75,8 +75,8 @@ osiris::create_AgProdChange_xml(
   write_dir = paste0(data_folder,"/outputs_create_AgProdChange_xml"),
   ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_ag_irr_ref.csv"),
   bio_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"),
-  ag_impacts = paste0(data_folder,"/gcam_basin_crops_impact_multipliers/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
-  bio_impacts = paste0(data_folder,"/gcam_basin_crops_impact_multipliers/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  ag_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  bio_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
   GCAM_region_mapping = paste0(data_folder,"/mapping_data/GCAM_region_names.csv"),
   timestep = 5,
   maxHistYear = 2010,

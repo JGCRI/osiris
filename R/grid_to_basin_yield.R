@@ -366,7 +366,7 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     # Wheat is weird
     # TODO:
-    if(crop == 'wheat' | crop == 'Wheat'){
+    if(grepl("^wheat$",crop,ignore.case=T)){
       # open up both winter and spring wheat response functions:
       ncin_swh <- ncdf4::nc_open(ncfname[grepl("spring", ncfname)])
 
