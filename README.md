@@ -51,7 +51,7 @@ Additional steps for UBUNTU from a terminal
 ```
 sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
-sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libproj-dev libavfilter-dev
+sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libproj-dev libavfilter-dev
 ```
 
 Additional steps for MACOSX from a terminal
