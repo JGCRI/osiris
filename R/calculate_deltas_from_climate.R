@@ -3,7 +3,7 @@
 #' Function to process climate data to calculate delta P and delta T.
 #'
 #' @param climate_dir Default = NULL
-#' @param write_dir Default = getwd(). Output Folder
+#' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
 #' @param esm_name Default = 'CanESM5'
 #' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
@@ -25,7 +25,7 @@
 #' }
 
 calculate_deltas_from_climate <- function(climate_dir = NULL,
-                                          write_dir = getwd(),
+                                          write_dir = "outputs_calculate_delta_from_climate",
                                           esm_name = 'CanESM5',
                                           crops = c("Corn", "Wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
@@ -43,6 +43,9 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   #.........................
 
   rlang::inform("Starting calculate_deltas_from_climate...")
+
+  # Check write dir
+  if(!dir.exists(write_dir)){dir.create(write_dir)}
 
   # Initialize values
   NULL -> areamask -> basePr -> baseTemp -> crop -> gslength -> hmonth ->

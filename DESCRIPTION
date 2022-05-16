@@ -22,7 +22,12 @@ Imports:
 	rlang,
 	tibble,
 	tidyr,
-	magrittr
+	magrittr,
+	sp,
+	raster,
+	class,
+	foreach,
+	gcamdata
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
