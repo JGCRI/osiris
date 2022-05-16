@@ -34,9 +34,18 @@
     <loc>/reference/calculate_deltas_from_climate.html</loc>
   </url>
   <url>
+    <loc>/reference/create_AgProdChange_xml.html</loc>
+  </url>
+  <url>
+    <loc>/reference/grid_to_basin_yield.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/osiris.html</loc>
+  </url>
+  <url>
+    <loc>/reference/yield_to_gcam_basin.html</loc>
   </url>
 </urlset>

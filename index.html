@@ -105,41 +105,28 @@
   <div class="contents col-md-9">
 
 
-<!-- ------------------------>
-<!-- ------------------------>
-<div class="section level1">
+<!-- ------------------------><!-- ------------------------><div class="section level1">
 <div class="page-header"><h1 id="introduction">
 <a name="Introduction"></a>Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h1></div>
-<!-- ------------------------>
-<!-- ------------------------>
-<p><code>osiris</code> is R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM).</p>
+<!-- ------------------------><!-- ------------------------><p><code>osiris</code> is R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM).</p>
 <p><br></p>
-<p align="center">
-<a href="https://jgcri.github.io/osiris/articles/vignette.html" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="https://jgcri.github.io/osiris/articles/vignette.html" height="60"></a>
-</p>
-<!-- ------------------------>
-<!-- ------------------------>
+<p align="center"><a href="https://jgcri.github.io/osiris/articles/vignette.html" target="_blank" class="external-link"><img src="https://github.com/JGCRI/jgcricolors/blob/main/vignettes/button_user_guide.PNG?raw=true" alt="https://jgcri.github.io/osiris/articles/vignette.html" height="60"></a></p>
+<!-- ------------------------><!-- ------------------------>
 </div>
 <div class="section level1">
 <h1 id="citation">
 <a name="Citation"></a>Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h1>
-<!-- ------------------------>
-<!-- ------------------------>
-<p>Snyder, A., Ahsan, H., Khan, Z., Kyle, P., Vernon, C.R. 2022. osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). (In progress) Journal of Open Source Software, DOI: XXXX</p>
-<!-- ------------------------>
-<!-- ------------------------>
+<!-- ------------------------><!-- ------------------------><p>Snyder, A., Ahsan, H., Khan, Z., Kyle, P., Vernon, C.R. 2022. osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). (In progress) Journal of Open Source Software, DOI: XXXX</p>
+<!-- ------------------------><!-- ------------------------>
 </div>
 <div class="section level1">
 <h1 id="installation-guide">
 <a name="InstallGuide"></a>Installation Guide<a class="anchor" aria-label="anchor" href="#installation-guide"></a>
 </h1>
-<!-- ------------------------>
-<!-- ------------------------>
-<ol style="list-style-type: decimal">
-<li>Download and install:
-<ul>
+<!-- ------------------------><!-- ------------------------><ol style="list-style-type: decimal">
+<li>Download and install:<ul>
 <li>R (<a href="https://www.r-project.org/" class="external-link uri">https://www.r-project.org/</a>)</li>
 <li>R studio (<a href="https://www.rstudio.com/" class="external-link uri">https://www.rstudio.com/</a>) (Optional)</li>
 </ul>
@@ -149,28 +136,19 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/osiris"</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/osiris"</span><span class="op">)</span></code></pre></div>
 <p>Additional steps for UBUNTU from a terminal</p>
 <pre><code>sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
-sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libavfilter-dev  libmagick++-dev</code></pre>
+sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libproj-dev libavfilter-dev</code></pre>
 <p>Additional steps for MACOSX from a terminal</p>
-<pre><code>brew install pkg-config
-brew install gdal
-brew install geos
-brew install imagemagick@6</code></pre>
-<!-- ------------------------>
-<!-- ------------------------>
+<pre><code>brew install pkg-config</code></pre>
+<!-- ------------------------><!-- ------------------------>
 </div>
 <div class="section level1">
 <h1 id="related-publications">
 <a name="Publications"></a>Related Publications<a class="anchor" aria-label="anchor" href="#related-publications"></a>
 </h1>
-<!-- ------------------------>
-<!-- ------------------------>
-<ul>
+<!-- ------------------------><!-- ------------------------><ul>
 <li>Müller, C., Franke, J., Jägermeyr, J., Ruane, A.C., Elliott, J., Moyer, E., Heinke, J., Falloon, P.D., Folberth, C., Francois, L. and Hank, T., 2021. Exploring uncertainties in global crop yield projections in a large ensemble of crop models and CMIP5 and CMIP6 climate scenarios. Environmental Research Letters, 16(3), p.034040. <a href="https://doi.org/10.1088/1748-9326/abd8fc" class="external-link uri">https://doi.org/10.1088/1748-9326/abd8fc</a>
 </li>
 <li>Franke, J.A., Müller, C., Elliott, J., Ruane, A.C., Jägermeyr, J., Snyder, A., Dury, M., Falloon, P.D., Folberth, C., François, L. and Hank, T., 2020. The GGCMI Phase 2 emulators: global gridded crop model responses to changes in CO 2, temperature, water, and nitrogen (version 1.0). Geoscientific Model Development, 13(9), pp.3995-4018. <a href="https://doi.org/10.5194/gmd-13-3995-2020" class="external-link uri">https://doi.org/10.5194/gmd-13-3995-2020</a>
@@ -234,7 +212,7 @@ brew install imagemagick@6</code></pre>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>

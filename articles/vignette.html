@@ -141,11 +141,32 @@
 }
 
 </style>
-<!-- ------------------------><!-- ------------------------><div class="section level2">
+<!--------------------------><!--------------------------><div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<!-------------------------->
+<!-------------------------->
+<p align="center">
+<img src="vignetteFigs/divider.png"></p>
+<p>Introduction to Osiris. Describe overall concept and purpose then list the four steps n bullets with breif descriptions of each.</p>
+<p align="center" style="font-size:18px;">
+<em>Workflow Summary</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_summary.jpg"></p>
+<p align="center" style="font-size:18px;">
+<em>Workflow Details</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_detail.jpg"></p>
+<!-------------------------->
+<!-------------------------->
+</div>
+<div class="section level2">
 <h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h2>
-<!-- ------------------------>
-<!-- ------------------------>
+<!-------------------------->
+<!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
 <ol style="list-style-type: decimal">
@@ -163,33 +184,189 @@
 <p>Additional steps for UBUNTU from a terminal</p>
 <pre><code>sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
-sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libgdal-dev libgeos-dev libproj-dev libavfilter-dev  libmagick++-dev</code></pre>
+sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libavfilter-dev  libmagick++-dev</code></pre>
 <p>Additional steps for MACOSX from a terminal</p>
-<pre><code>brew install pkg-config
-brew install gdal
-brew install geos
-brew install imagemagick@6</code></pre>
+<pre><code>brew install pkg-config</code></pre>
 <!-------------------------->
 <!-------------------------->
 </div>
 <div class="section level2">
-<h2 id="inputs">Input Formats<a class="anchor" aria-label="anchor" href="#inputs"></a>
+<h2 id="step-1">Step 1<a class="anchor" aria-label="anchor" href="#step-1"></a>
 </h2>
 <!-------------------------->
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Input details here.</p>
+<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<div class="section level3">
+<h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
+</h3>
+<p align="center" style="font-size:18px;">
+<em>Step 1 Workflow</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_detail_step1.jpg"></p>
+</div>
+<div class="section level3">
+<h3 id="table">Table<a class="anchor" aria-label="anchor" href="#table"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="example-script">Example Script<a class="anchor" aria-label="anchor" href="#example-script"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
+<span class="co"># Step 1: calculate_deltas_from_climate</span>
+<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_deltas_from_climate.html">calculate_deltas_from_climate</a></span><span class="op">(</span>
+  climate_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/climate_data"</span><span class="op">)</span>,
+  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,
+  monthly_growing_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"</span><span class="op">)</span>,
+  monthly_harvest_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"</span><span class="op">)</span>,
+  growing_season_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_season_climate_data"</span><span class="op">)</span>,
+  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,
+  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,
+  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,
+  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,
+  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,
+  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>
+<span class="op">)</span></code></pre></div>
 <!-------------------------->
 <!-------------------------->
 </div>
+</div>
 <div class="section level2">
-<h2 id="outputs">Output Formats<a class="anchor" aria-label="anchor" href="#outputs"></a>
+<h2 id="step-2">Step 2<a class="anchor" aria-label="anchor" href="#step-2"></a>
 </h2>
 <!-------------------------->
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
+<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<div class="section level3">
+<h3 id="workflow-1">Workflow<a class="anchor" aria-label="anchor" href="#workflow-1"></a>
+</h3>
+<p align="center" style="font-size:18px;">
+<em>Step 2 Workflow</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_detail_step2.jpg"></p>
+</div>
+<div class="section level3">
+<h3 id="table-1">Table<a class="anchor" aria-label="anchor" href="#table-1"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="example-script-1">Example Script<a class="anchor" aria-label="anchor" href="#example-script-1"></a>
+</h3>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
+<span class="co"># Step 2: grid_to_basin_yield</span>
+<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/grid_to_basin_yield.html">grid_to_basin_yield</a></span><span class="op">(</span>
+  carbon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_inputs/magicc_rcp8p5_co2.csv"</span><span class="op">)</span>,
+  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,
+  emulator_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_fcns/ggcmi_phase2"</span><span class="op">)</span>,
+  input_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,
+  area_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/area_data"</span><span class="op">)</span>,
+  basin_grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gridData.csv"</span><span class="op">)</span>,
+  basin_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,
+  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,
+  wheat_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/winter_and_spring_wheat_areas_v1_180627.nc4"</span><span class="op">)</span>,
+  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,
+  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,
+  cm_name <span class="op">=</span> <span class="st">'LPJmL'</span>,
+  scn_name <span class="op">=</span> <span class="st">'rcp8p5'</span>,
+  N <span class="op">=</span> <span class="fl">200</span>
+<span class="op">)</span></code></pre></div>
+<!-------------------------->
+<!-------------------------->
+</div>
+</div>
+<div class="section level2">
+<h2 id="step-3">Step 3<a class="anchor" aria-label="anchor" href="#step-3"></a>
+</h2>
+<!-------------------------->
+<!-------------------------->
+<p align="center">
+<img src="vignetteFigs/divider.png"></p>
+<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<div class="section level3">
+<h3 id="workflow-2">Workflow<a class="anchor" aria-label="anchor" href="#workflow-2"></a>
+</h3>
+<p align="center" style="font-size:18px;">
+<em>Step 3 Workflow</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_detail_step3.jpg"></p>
+</div>
+<div class="section level3">
+<h3 id="table-2">Table<a class="anchor" aria-label="anchor" href="#table-2"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="example-script-2">Example Script<a class="anchor" aria-label="anchor" href="#example-script-2"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
+<span class="co"># Step 3: yield_to_gcam_basin</span>
+<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/yield_to_gcam_basin.html">yield_to_gcam_basin</a></span><span class="op">(</span>
+  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin"</span><span class="op">)</span>,
+  emulated_basin_yield_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,
+  iso_GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/iso_GCAM_regID.csv"</span><span class="op">)</span>,
+  FAO_ag_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/FAO_ag_items_PRODSTAT_expanded_corrected.csv"</span><span class="op">)</span>,
+  iso_harvest_area_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/L100.LDS_ag_HA_ha.csv"</span><span class="op">)</span>,
+  iso_GCAM_basin_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,
+  max_CCImult <span class="op">=</span> <span class="fl">2.5</span>,
+  min_CCImult <span class="op">=</span> <span class="fl">0.01</span>,
+  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,
+  rolling_avg_years <span class="op">=</span> <span class="fl">15</span>,
+  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,
+  minFutYear <span class="op">=</span> <span class="fl">2015</span>,
+  maxFutYear <span class="op">=</span> <span class="fl">2100</span>
+<span class="op">)</span></code></pre></div>
+<!-------------------------->
+<!-------------------------->
+</div>
+</div>
+<div class="section level2">
+<h2 id="step-4">Step 4<a class="anchor" aria-label="anchor" href="#step-4"></a>
+</h2>
+<!-------------------------->
+<!-------------------------->
+<p align="center">
+<img src="vignetteFigs/divider.png"></p>
+<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<div class="section level3">
+<h3 id="workflow-3">Workflow<a class="anchor" aria-label="anchor" href="#workflow-3"></a>
+</h3>
+<p align="center" style="font-size:18px;">
+<em>Step 4 Workflow</em>
+</p>
+<p align="center">
+<img src="vignetteFigs/osiris_workflow_detail_step4.jpg"></p>
+</div>
+<div class="section level3">
+<h3 id="table-3">Table<a class="anchor" aria-label="anchor" href="#table-3"></a>
+</h3>
+</div>
+<div class="section level3">
+<h3 id="example-script-3">Example Script<a class="anchor" aria-label="anchor" href="#example-script-3"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
+<span class="co"># Step 4: create_AgProdChange_xml</span>
+<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/create_AgProdChange_xml.html">create_AgProdChange_xml</a></span><span class="op">(</span>
+  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_create_AgProdChange_xml"</span><span class="op">)</span>,
+  ag_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_ag_irr_ref.csv"</span><span class="op">)</span>,
+  bio_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"</span><span class="op">)</span>,
+  ag_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,
+  bio_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,
+  GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/GCAM_region_names.csv"</span><span class="op">)</span>,
+  timestep <span class="op">=</span> <span class="fl">5</span>,
+  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,
+  minFutYear <span class="op">=</span> <span class="fl">2015</span>,
+  appliedto <span class="op">=</span> <span class="st">"full"</span>
+<span class="op">)</span></code></pre></div>
+</div>
 </div>
   </div>
 
@@ -210,7 +387,7 @@ brew install imagemagick@6</code></pre>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
       </footer>
