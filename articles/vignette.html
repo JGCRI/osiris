@@ -148,7 +148,7 @@
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Introduction to Osiris. Describe overall concept and purpose then list the four steps n bullets with breif descriptions of each.</p>
+<p>Osiris is an R package that is used to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). This package is a modular data pipeline that consists of four steps that take gridded crop yield data from existing emulators and transforms them into agricultural yield impacts for GCAM commodities. The four functions are run in series as follows, with a detailed workflow below: * calculate_deltas_from_climate() – obtain precipitation and temperature data for each crop and irrigation type, as well as the difference relative to baseline average * grid_to_basin_yield() – use global gridded crop model emulator output to generate crop yield and aggregate to GCAM basins * yield_to_gcam_basin() – convert agricultural yield data to multipliers for each GCAM commodity-irrigation-basin * create_AgProdChange_xml() – apply multipliers to AgProdChange from GCAM reference and obtain a new file in xml format</p>
 <p align="center" style="font-size:18px;">
 <em>Workflow Summary</em>
 </p>
@@ -197,7 +197,7 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<p>The first step in the workflow processes climate data (see table for source) for each crop and irrigation type. The growing season-average precipitation and temperature data is calculated and smoothed to obtain the long term growing season average values. Then the change relative to 1980-2010 is calculated to obtain changes in long term growing season average values relative to baseline. A detailed workflow is shown below. The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h3>
@@ -210,6 +210,23 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <div class="section level3">
 <h3 id="table">Table<a class="anchor" aria-label="anchor" href="#table"></a>
 </h3>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="73%">
+<col width="8%">
+<col width="18%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Reference</th>
+<th>Source</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td>pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc pr_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc tas_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc</td>
+<td>Swart et al., 2019</td>
+<td><a href="https://doi.org/10.22033/ESGF/CMIP6.3610" class="external-link uri">https://doi.org/10.22033/ESGF/CMIP6.3610</a></td>
+</tr></tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="example-script">Example Script<a class="anchor" aria-label="anchor" href="#example-script"></a>
@@ -241,7 +258,7 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<p>The second step in the workflow uses the output from a global gridded crop model emulator to generate crop yield that is aggregated to GCAM basins. The winter and spring wheat area file (see table) is used to unify the emulator data for spring and winter wheat into a single grid. The crop yield is calculated using a polynomial equation (Franke et al., 2020) based on the precipitation and temperature data obtained from Step 1. The yields are then aggregated to GCAM basins using MIRCA2000 harvested area. A detailed workflow is shown below. The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-1">Workflow<a class="anchor" aria-label="anchor" href="#workflow-1"></a>
 </h3>
@@ -254,6 +271,36 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <div class="section level3">
 <h3 id="table-1">Table<a class="anchor" aria-label="anchor" href="#table-1"></a>
 </h3>
+<table class="table">
+<colgroup>
+<col width="61%">
+<col width="6%">
+<col width="32%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Reference</th>
+<th>Source</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>LPJmL_maize_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_rice_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_soy_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_spring_wheat_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_winter_wheat_ggcmi_phase2_emulator_A0.nc4</td>
+<td>Franke, 2019</td>
+<td><a href="https://doi.org/10.5281/zenodo.3592453" class="external-link uri">https://doi.org/10.5281/zenodo.3592453</a></td>
+</tr>
+<tr class="even">
+<td>winter_and_spring_wheat_areas_v1_180627.nc4</td>
+<td>Müller, 2020</td>
+<td><a href="https://doi.org/10.5281/zenodo.3773827" class="external-link uri">https://doi.org/10.5281/zenodo.3773827</a></td>
+</tr>
+<tr class="odd">
+<td>annual_area_harvested_irc_crop01_ha_30mn.asc<br>⋮<br>annual_area_harvested_irc_crop26_ha_30mn.asc<br>annual_area_harvested_rfc_crop01_ha_30mn.asc<br>⋮<br>annual_area_harvested_rfc_crop26_ha_30mn.asc</td>
+<td>Portmann et al., 2010</td>
+<td>
+<a href="https://doi.org/10.1029/2008GB003435" class="external-link uri">https://doi.org/10.1029/2008GB003435</a><br>(data: <a href="https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000" class="external-link uri">https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000</a>)</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="example-script-1">Example Script<a class="anchor" aria-label="anchor" href="#example-script-1"></a>
@@ -288,7 +335,7 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<p>The third step in the workflow converts the agricultural yield data from the second step to crop-irrigation-basin multipliers, which are then converted to multipliers for each GCAM commodity-irrigation-basin based on GTAP harvested area weights. A detailed workflow is shown below. The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-2">Workflow<a class="anchor" aria-label="anchor" href="#workflow-2"></a>
 </h3>
@@ -334,7 +381,7 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <p align="center">
 <img src="vignetteFigs/divider.png"></p>
-<p>Description here with reference to figure, table and script below. All exogenous inputs should have sources and doi’s.</p>
+<p>The fourth step in the workflow applies the multipliers generated in the third step to GCAM reference AgProdChange and creates an updated file in xml format. A detailed workflow is shown below. The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-3">Workflow<a class="anchor" aria-label="anchor" href="#workflow-3"></a>
 </h3>
