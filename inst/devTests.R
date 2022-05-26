@@ -2,7 +2,7 @@
 library(osiris); library(dplyr);library(tibble);library(ncdf4);library(rlang); library(data.table)
 
 # Change data folder
-data_folder <- "C:/Users/ahsa361/Documents/yieldEmu4GCAM/data"
+data_folder = ADD_PATH_TO_YOUR_OSIRIS_DATA
 
 # Tests for Step 1: calculate_deltas_from_climate
 osiris::calculate_deltas_from_climate(
