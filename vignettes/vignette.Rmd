@@ -46,10 +46,11 @@ resourse_files:
 <p align="center"> <img src="vignetteFigs/divider.png"></p>
 
 Osiris is an R package that is used to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). This package is a modular data pipeline that consists of four steps that take gridded crop yield data from existing emulators and transforms them into agricultural yield impacts for GCAM commodities. The four functions are run in series as follows, with a detailed workflow below:
-* calculate_deltas_from_climate() – obtain precipitation and temperature data for each crop and irrigation type, as well as the difference relative to baseline average
-* grid_to_basin_yield() – use global gridded crop model emulator output to generate crop yield and aggregate to GCAM basins
-* yield_to_gcam_basin() – convert agricultural yield data to multipliers for each GCAM commodity-irrigation-basin
-* create_AgProdChange_xml() – apply multipliers to AgProdChange from GCAM reference and obtain a new file in xml format
+
+- calculate_deltas_from_climate(): obtain precipitation and temperature data for each crop and irrigation type, as well as the difference relative to baseline average
+- grid_to_basin_yield(): use global gridded crop model emulator output to generate crop yield and aggregate to GCAM basins
+- yield_to_gcam_basin(): convert agricultural yield data to multipliers for each GCAM commodity-irrigation-basin
+- create_AgProdChange_xml(): apply multipliers to AgProdChange from GCAM reference and obtain a new file in xml format
 
 <p align="center" style="font-size:18px;"> *Workflow Summary* </p>
 <p align="center"> <img src="vignetteFigs/osiris_workflow_summary.jpg"></p>
