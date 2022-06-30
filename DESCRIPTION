@@ -27,7 +27,8 @@ Imports:
 	raster,
 	class,
 	foreach,
-	gcamdata
+	gcamdata,
+	sf
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

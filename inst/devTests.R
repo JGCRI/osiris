@@ -4,6 +4,16 @@ library(osiris); library(dplyr);library(tibble);library(ncdf4);library(rlang); l
 # Change data folder
 data_folder = ADD_PATH_TO_YOUR_OSIRIS_DATA
 
+# Tests for Step 0: wrf_to_osiris
+osiris::wrf_to_osiris(
+  wrf_ncdf = ADD_PATH_TO_YOUR_WRF_DATA,
+  write_dir = paste0(data_folder,"/wrf_to_osiris"),
+  osiris_ncdf = paste0(data_folder,"/climate_data/tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc"),
+  time_step = "3 hours",
+  nc_filename = "wrf_monthly.nc"
+)
+
+
 # Tests for Step 1: calculate_deltas_from_climate
 osiris::calculate_deltas_from_climate(
   climate_dir = paste0(data_folder,"/climate_data"),
