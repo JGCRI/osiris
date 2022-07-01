@@ -9,7 +9,7 @@ wrf_to_osiris(
   osiris_ncdf = NULL,
   write_dir = "wrf_to_osiris",
   time_step = "3 hours",
-  nc_filename = "wrf_monthly.nc"
+  scenario = NULL
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ of a month. You can add multiple paths, just put in a list, e.g., c("/path1", "/
 
 \item{time_step}{Default = "3 hours". Other option is "1 hour".}
 
-\item{nc_filename}{Default = "wrf_monthly.nc". Output file name, change as needed.}
+\item{scenario}{Default = NULL. Scenario to put in output ncdf filename.}
 }
 \value{
 number

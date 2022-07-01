@@ -10,7 +10,7 @@ osiris::wrf_to_osiris(
   write_dir = paste0(data_folder,"/wrf_to_osiris"),
   osiris_ncdf = paste0(data_folder,"/climate_data/tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc"),
   time_step = "3 hours",
-  nc_filename = "wrf_monthly.nc"
+  scenario = "historical"
 )
 
 

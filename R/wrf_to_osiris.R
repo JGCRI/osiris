@@ -9,7 +9,7 @@
 #' @param osiris_ncdf Default = NULL. Path to osiris temperature nc file.
 #' @param write_dir Default = "wrf_to_osiris". Output Folder.
 #' @param time_step Default = "3 hours". Other option is "1 hour".
-#' @param nc_filename Default = "wrf_monthly.nc". Output file name, change as needed.
+#' @param scenario Default = NULL. Scenario to put in output ncdf filename.
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -25,7 +25,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
                           osiris_ncdf = NULL,
                           write_dir = "wrf_to_osiris",
                           time_step = "3 hours",
-                          nc_filename = "wrf_monthly.nc") {
+                          scenario = NULL) {
 
 
 
@@ -219,26 +219,24 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   wrf_temperature <- raster::stack(wrf_T2_ras)
   wrf_precipitation <- raster::stack(wrf_precip_ras)
 
-  # Define output filename
-  filename <- paste0(write_dir, "/", nc_filename)
-
   # Longitude and Latitude data
   xvals <- unique(raster::values(raster::init(wrf_temperature, "x")))
   yvals <- unique(raster::values(raster::init(wrf_temperature, "y")))
   nx <- length(xvals)
   ny <- length(yvals)
-  lon <- ncdf4::ncdim_def("longitude", "degrees_east", xvals)
-  lat <- ncdf4::ncdim_def("latitude", "degrees_north", yvals)
+  lon <- ncdf4::ncdim_def("lon", "degrees_east", xvals)
+  lat <- ncdf4::ncdim_def("lat", "degrees_north", yvals)
 
   # Missing value to use
   mv <- -999
 
   # Time component
-  time <- ncdf4::ncdim_def(name = "Time",
-                           units = paste0("months since ", substr(wrf_layers$layers[1], 1, 7)),
+  time <- ncdf4::ncdim_def(name = "time",
+                           units = paste0("days since ", substr(wrf_layers$layers[1], 1, 10)),
                            vals = 0:(raster::nlayers(wrf_temperature)-1),
                            unlim = TRUE,
-                           longname = "time")
+                           longname = "time",
+                           calendar = "365_day")
 
   # Define the temperature variables
   var_temp <- ncdf4::ncvar_def(name = "tas",
@@ -256,32 +254,53 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
                                missval = mv,
                                compression = 9)
 
-  # Add the variables to the file
-  ncout <- ncdf4::nc_create(filename, list(var_prec, var_temp), force_v4 = TRUE)
-  print(paste("The file has", ncout$nvars, "variables"))
-  print(paste("The file has", ncout$ndim, "dimensions"))
+  # Generate the temperature file
+  ncout_tas <- ncdf4::nc_create(paste0(write_dir, "/tas_wrf_", scenario, ".nc"), var_temp, force_v4 = TRUE)
+  print(paste("The file has", ncout_tas$nvars, "variables"))
+  print(paste("The file has", ncout_tas$ndim, "dimensions"))
 
   # Add some global attributes
-  ncdf4::ncatt_put(ncout, 0, "Title", "wrf_to_osiris temperature and precipitation flux monthly output")
-  ncdf4::ncatt_put(ncout, 0, "Source", "WRF data")
-  ncdf4::ncatt_put(ncout, 0, "References", "https://jgcri.github.io/osiris/")
-  ncdf4::ncatt_put(ncout, 0, "Created on", date())
+  ncdf4::ncatt_put(ncout_tas, 0, "Title", "wrf_to_osiris temperature monthly output")
+  ncdf4::ncatt_put(ncout_tas, 0, "Source", "WRF data")
+  ncdf4::ncatt_put(ncout_tas, 0, "References", "https://jgcri.github.io/osiris/")
+  ncdf4::ncatt_put(ncout_tas, 0, "Created on", date())
 
-  # Place the precipitation and temperature values in the file and loop through
+  # Place the temperature values in the file and loop through
   # the layers to get them to match the correct time index
   for (i in 1:raster::nlayers(wrf_temperature)) {
-    ncdf4::ncvar_put(nc = ncout,
-                     varid = var_prec,
-                     vals = raster::values(wrf_precipitation[[i]]),
-                     start = c(1, 1, i),
-                     count = c(-1, -1, 1))
-    ncdf4::ncvar_put(ncout, var_temp, raster::values(wrf_temperature[[i]]),
+    ncdf4::ncvar_put(nc = ncout_tas,
+                     varid = var_temp,
+                     vals = raster::values(wrf_temperature[[i]]),
                      start = c(1, 1, i),
                      count = c(-1, -1, 1))
   }
 
   # Close the netcdf file
-  ncdf4::nc_close(ncout)
+  ncdf4::nc_close(ncout_tas)
+
+  # Generate the precipitation flux file
+  ncout_pr <- ncdf4::nc_create(paste0(write_dir, "/pr_wrf_", scenario, ".nc"), var_prec, force_v4 = TRUE)
+  print(paste("The file has", ncout_pr$nvars, "variables"))
+  print(paste("The file has", ncout_pr$ndim, "dimensions"))
+
+  # Add some global attributes
+  ncdf4::ncatt_put(ncout_pr, 0, "Title", "wrf_to_osiris precipitation flux monthly output")
+  ncdf4::ncatt_put(ncout_pr, 0, "Source", "WRF data")
+  ncdf4::ncatt_put(ncout_pr, 0, "References", "https://jgcri.github.io/osiris/")
+  ncdf4::ncatt_put(ncout_pr, 0, "Created on", date())
+
+  # Place the precipitation values in the file and loop through
+  # the layers to get them to match the correct time index
+  for (i in 1:raster::nlayers(wrf_precipitation)) {
+    ncdf4::ncvar_put(nc = ncout_pr,
+                     varid = var_prec,
+                     vals = raster::values(wrf_precipitation[[i]]),
+                     start = c(1, 1, i),
+                     count = c(-1, -1, 1))
+  }
+
+  # Close the netcdf file
+  ncdf4::nc_close(ncout_pr)
 
   #.........................
   # Close Out
