@@ -28,7 +28,6 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
                           scenario = NULL) {
 
 
-
   #.........................
   # Initialize
   #.........................
@@ -49,21 +48,31 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   # Function to reproject wrf to osiris CRS and resolution. Output is a list
   # of raster layers.
   wrf_fun <- function(x) {
-    # Step 1: convert to a table with lat, lon, and z
-    wrf_ncdf_ras_df <- as.data.frame(x, xy = TRUE, na.rm = TRUE) %>%
+    # Get lat and lon from raster (first file, doesn't matter since all the same lat/lon)
+    wrf_ncdf_lat <- (raster::brick(list.filepath[1], varname = 'XLAT', ncdf = TRUE))[[1]]
+    wrf_ncdf_lon <- (raster::brick(list.filepath[1], varname = 'XLONG', ncdf = TRUE))[[1]]
+
+    # Get Lat long
+    wrf_ncdf_lat_df <- raster::as.data.frame(wrf_ncdf_lat, xy = TRUE, na.rm = TRUE) %>%
+      dplyr::rename(lat = X1)
+    wrf_ncdf_lon_df <- raster::as.data.frame(wrf_ncdf_lon, xy = TRUE, na.rm = TRUE) %>%
+      dplyr::rename(lon = X1)
+
+    # Convert to a table with lat, lon, and z
+    wrf_ncdf_ras_df <- raster::as.data.frame(x, xy = TRUE, na.rm = TRUE) %>%
       dplyr::rename(z = 3) %>%
       dplyr::left_join(wrf_ncdf_lat_df, by=c("x","y")) %>%
       dplyr::left_join(wrf_ncdf_lon_df, by=c("x","y")) %>%
       dplyr::select(lat,lon,z)
 
-    # Step 2: convert to sf object using sf::st_as_sf
+    # Convert to sf object using sf::st_as_sf
     wrf_ncdf_sf <- wrf_ncdf_ras_df %>%
       sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
 
-    # Step 3: reproject to correct crs
+    # Reproject to correct crs
     wrf_ncdf_sf_osiris_crs <- sf::st_shift_longitude(wrf_ncdf_sf)
 
-    # Step 4: Reproject to correct resolution
+    # Reproject to correct resolution
     wrf_osiris_ras <- raster::rasterize(wrf_ncdf_sf_osiris_crs,
                                         osiris_ncdf_ras,
                                         wrf_ncdf_sf_osiris_crs$z,
@@ -86,7 +95,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   # Convert raster in to an sf object ============================================
 
   # Step 1: convert to a table with lat, lon, and z
-  osiris_ncdf_ras_df <- as.data.frame(osiris_ncdf_ras, xy = TRUE, na.rm = TRUE) %>%
+  osiris_ncdf_ras_df <- raster::as.data.frame(osiris_ncdf_ras, xy = TRUE, na.rm = TRUE) %>%
     dplyr::select(lat = y, lon = x, z = 3)
 
   # Step 2: convert to sf object using sf::st_as_sf
@@ -141,16 +150,6 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
     dplyr::group_by(year, month) %>%
     dplyr::mutate(id = dplyr::cur_group_id())
 
-  # Get lat and lon from raster (first file, doesn't matter since all the same lat/lon)
-  wrf_ncdf_lat <- (raster::brick(list.filepath[1], varname = 'XLAT', ncdf = TRUE))[[1]]
-  wrf_ncdf_lon <- (raster::brick(list.filepath[1], varname = 'XLONG', ncdf = TRUE))[[1]]
-
-  # Get Lat long
-  wrf_ncdf_lat_df <- as.data.frame(wrf_ncdf_lat, xy = TRUE, na.rm = TRUE) %>%
-    dplyr::rename(lat = X1)
-  wrf_ncdf_lon_df <- as.data.frame(wrf_ncdf_lon, xy = TRUE, na.rm = TRUE) %>%
-    dplyr::rename(lon = X1)
-
   # Create subset of raster layers based on year-month id. We drop the last year-
   # month id since we want the temperature time steps to match with precipitation,
   # which will be the delta from the beginning of the month to the next, so it won't
@@ -161,7 +160,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   }
 
   # Calculate monthly mean temperature
-  wrf_T2_mean <- lapply(wrf_T2_sub, mean)
+  wrf_T2_mean <- lapply(wrf_T2_sub, raster::mean)
 
   # Apply reprojection function on temperature data
   rlang::inform("Reprojecting WRF temperature data...")
@@ -232,11 +231,10 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   # Time component
   time <- ncdf4::ncdim_def(name = "time",
-                           units = paste0("days since ", substr(wrf_layers$layers[1], 1, 10)),
+                           units = paste0("months since ", substr(wrf_layers$layers[1], 1, 10)),
                            vals = 0:(raster::nlayers(wrf_temperature)-1),
                            unlim = TRUE,
-                           longname = "time",
-                           calendar = "365_day")
+                           longname = "time")
 
   # Define the temperature variables
   var_temp <- ncdf4::ncvar_def(name = "tas",
@@ -256,8 +254,8 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   # Generate the temperature file
   ncout_tas <- ncdf4::nc_create(paste0(write_dir, "/tas_wrf_", scenario, ".nc"), var_temp, force_v4 = TRUE)
-  print(paste("The file has", ncout_tas$nvars, "variables"))
-  print(paste("The file has", ncout_tas$ndim, "dimensions"))
+  print(paste("The temperature file has", ncout_tas$nvars, "variables"))
+  print(paste("The temperature file has", ncout_tas$ndim, "dimensions"))
 
   # Add some global attributes
   ncdf4::ncatt_put(ncout_tas, 0, "Title", "wrf_to_osiris temperature monthly output")
@@ -280,8 +278,8 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   # Generate the precipitation flux file
   ncout_pr <- ncdf4::nc_create(paste0(write_dir, "/pr_wrf_", scenario, ".nc"), var_prec, force_v4 = TRUE)
-  print(paste("The file has", ncout_pr$nvars, "variables"))
-  print(paste("The file has", ncout_pr$ndim, "dimensions"))
+  print(paste("The precipitation file has", ncout_pr$nvars, "variables"))
+  print(paste("The precipitation file has", ncout_pr$ndim, "dimensions"))
 
   # Add some global attributes
   ncdf4::ncatt_put(ncout_pr, 0, "Title", "wrf_to_osiris precipitation flux monthly output")
