@@ -26,7 +26,13 @@ osiris::calculate_deltas_from_climate(
   irrigation_rainfed = c("IRR", "RFD"),
   minlat = -87.8638,
   minlon = -179.75,
-  rollingAvgYears = 15
+  rollingAvgYears = 15,
+  tas_historical = "tas_wrf_historical.nc",
+  tas_projected = "tas_wrf_ssp585_hot_fix.nc",
+  pr_historical = "pr_wrf_historical.nc",
+  pr_projected = "pr_wrf_ssp585_hot_fix.nc",
+  historical_start_year = 1979,
+  projection_start_year = 2019
 )
 
 
@@ -78,7 +84,8 @@ osiris::yield_to_gcam_basin(
   rolling_avg_years = 15,
   maxHistYear = 2010,
   minFutYear = 2015,
-  maxFutYear = 2100
+  maxFutYear = 2100,
+  extrapolate_to = 2100
 )
 
 # write_dir = paste0(data_folder,"/outputs_yield_to_gcam_basin")

@@ -15,7 +15,13 @@ calculate_deltas_from_climate(
   monthly_growing_season = NULL,
   monthly_harvest_season = NULL,
   rollingAvgYears = 15,
-  growing_season_dir = NULL
+  growing_season_dir = NULL,
+  tas_historical = NULL,
+  tas_projected = NULL,
+  pr_historical = NULL,
+  pr_projected = NULL,
+  historical_start_year = NULL,
+  projection_start_year = NULL
 )
 }
 \arguments{
@@ -40,6 +46,18 @@ calculate_deltas_from_climate(
 \item{rollingAvgYears}{Default = 15}
 
 \item{growing_season_dir}{Default = NULL}
+
+\item{tas_historical}{= NULL. Filename of historical temperature ncdf.}
+
+\item{tas_projected}{= NULL. Filename of projected (hot or cold) temperature ncdf.}
+
+\item{pr_historical}{= NULL. Filename of historical precipitation flux ncdf.}
+
+\item{pr_projected}{= NULL. Filename of projected (hot or cold) precipitation flux ncdf.}
+
+\item{historical_start_year}{= NULL. Start year of historical data.}
+
+\item{projection_start_year}{= NULL. Start year of projection data.}
 }
 \value{
 number

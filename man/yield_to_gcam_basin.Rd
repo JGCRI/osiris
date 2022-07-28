@@ -17,7 +17,8 @@ yield_to_gcam_basin(
   rolling_avg_years = 15,
   maxHistYear = 2010,
   minFutYear = 2015,
-  maxFutYear = 2100
+  maxFutYear = 2100,
+  extrapolate_to = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ yield_to_gcam_basin(
 \item{minFutYear}{Default = 2015 Min future year for which to apply rolling averages}
 
 \item{maxFutYear}{Default = 2100 Max future year for which to apply rolling averages}
+
+\item{extrapolate_to}{Default = NULL. Note that this extrapolates to only one future year (eg, 2099 to 2100)}
 }
 \value{
 number

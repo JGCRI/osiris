@@ -16,6 +16,7 @@
 #' @param maxHistYear Default = 2010 Historical year for which to apply rolling averages
 #' @param minFutYear Default = 2015 Min future year for which to apply rolling averages
 #' @param maxFutYear Default = 2100 Max future year for which to apply rolling averages
+#' @param extrapolate_to Default = NULL. Note that this extrapolates to only one future year (eg, 2099 to 2100)
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -39,7 +40,8 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
                                 rolling_avg_years = 15,
                                 maxHistYear = 2010,
                                 minFutYear = 2015,
-                                maxFutYear = 2100) {
+                                maxFutYear = 2100,
+                                extrapolate_to = NULL) {
 
 
 
@@ -152,6 +154,64 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   tibble::as_tibble(emu_data1) %>%
     dplyr::mutate_if(is.factor, as.character) ->
     emu_data1
+
+
+
+  #.........................
+  # Extrapolate
+  #.........................
+
+  # Example of extrapolating from 2099 to 2100:
+
+  if (!is.null(extrapolate_to)) {
+    rlang::inform(paste0("Extrapolating basin yield data to ", extrapolate_to))
+
+    # Capitalize first letter of crop column (not all capitalized before)
+    emu_data1$crop <- gsub("(?<!\\w)(.)","\\U\\1", emu_data1$crop, perl = TRUE)
+
+    # Add a new column for 2100 (switch to wide then back to long)
+    emu_data1 <- emu_data1 %>%
+      tidyr::spread(year, yield) %>%
+      tibble::add_column(!! paste0(extrapolate_to) := NA) %>%
+      tidyr::gather(key="year", value="yield", -c(gcm:rcp))
+
+    # Store years as numeric
+    emu_data1$year <- as.numeric(emu_data1$year)
+
+    # initialize lists
+    sub.data <- list()
+    irr.data <- list()
+    crop.data <- list()
+
+    # Loop through each crop-irr-id combination
+    for (i in unique(emu_data1$crop)) {
+      for (j in unique(emu_data1$irr)) {
+        for (k in emu_data1$id) {
+
+          # Create a subset for each crop-irr-id one after another
+          sub <- subset(emu_data1, crop==i & irr==j & id==k)
+
+          # Extrapolate to 2100
+          # make a linear model for each basin up to year 2099
+          interpol <- stats::lm(yield ~ year, data = sub)
+
+          # calculate the linear trend  (these values will differ from original ones because of the interpolation), for year 2100 the trend will be extended (extrapolation)
+          pred <- stats::predict(interpol, sub)
+
+          # insert the last predicted yield (for 2100)
+          sub$yield[which(sub$year == extrapolate_to)] <- pred[length(pred)]
+
+          sub.data[[k]] <- sub
+        }
+        irr.data[[j]] <- dplyr::bind_rows(sub.data)
+      }
+      crop.data[[i]] <- dplyr::bind_rows(irr.data)
+    }
+
+    # Bind
+    emu_data1 <- dplyr::bind_rows(crop.data)
+  }
+
 
   # emu_data1 %>%
   #   dplyr::filter(cropmodel != "lpj-guess") ->

@@ -113,6 +113,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   rlang::inform("Reading WRF netcdf file and processing...")
 
   list.filepath <- list.files(path = wrf_ncdf, pattern = ".nc", full.names = T)
+  list.filepath <- list.filepath[order(gsub("[^0-9]+", "", list.filepath))] # Order files by time
   for(i in 1:length(list.filepath)){
     wrf_T2_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'T2', ncdf = TRUE)
     wrf_RAINC_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINC', ncdf = TRUE)
