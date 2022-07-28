@@ -69,13 +69,13 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
     wrf_ncdf_sf <- wrf_ncdf_ras_df %>%
       sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
 
-    # Reproject to correct crs
-    wrf_ncdf_sf_osiris_crs <- sf::st_shift_longitude(wrf_ncdf_sf)
+    # Reproject to correct crs (shift from -180:180 to 0:360)
+    sf::st_geometry(wrf_ncdf_sf) <- sf::st_geometry(wrf_ncdf_sf) + c(180, 0)
 
     # Reproject to correct resolution
-    wrf_osiris_ras <- raster::rasterize(wrf_ncdf_sf_osiris_crs,
+    wrf_osiris_ras <- raster::rasterize(wrf_ncdf_sf,
                                         osiris_ncdf_ras,
-                                        wrf_ncdf_sf_osiris_crs$z,
+                                        wrf_ncdf_sf$z,
                                         fun = mean)
   }
 
