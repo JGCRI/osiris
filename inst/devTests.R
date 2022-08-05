@@ -16,21 +16,21 @@ osiris::wrf_to_osiris(
 
 # Tests for Step 1: calculate_deltas_from_climate
 osiris::calculate_deltas_from_climate(
-  climate_dir = paste0(data_folder,"/climate_data"),
+  climate_dir = paste0(data_folder,"/wrf_to_osiris"),
   write_dir = paste0(data_folder,"/outputs_calculate_delta_from_climate"),
   monthly_growing_season = paste0(data_folder,"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"),
   monthly_harvest_season = paste0(data_folder,"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"),
   growing_season_dir = paste0(data_folder,"/growing_season_climate_data"),
-  esm_name = 'CanESM5',
+  esm_name = "WRF",
   crops = c("Corn", "Wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
   minlat = -87.8638,
   minlon = -179.75,
   rollingAvgYears = 15,
   tas_historical = "tas_wrf_historical.nc",
-  tas_projected = "tas_wrf_ssp585_hot_fix.nc",
+  tas_projected = "tas_wrf_ssp585_hot.nc",
   pr_historical = "pr_wrf_historical.nc",
-  pr_projected = "pr_wrf_ssp585_hot_fix.nc",
+  pr_projected = "pr_wrf_ssp585_hot.nc",
   historical_start_year = 1979,
   projection_start_year = 2019
 )
@@ -48,9 +48,9 @@ osiris::grid_to_basin_yield(
   write_dir = paste0(data_folder,"/outputs_grid_to_basin_yield"),
   wheat_area = paste0(data_folder,"/winter_and_spring_wheat_areas_v1_180627.nc4"),
   crops = c("maize", "rice", "soy", "wheat"),
-  esm_name = 'CanESM5',
-  cm_name = 'LPJmL',
-  scn_name = 'rcp8p5',
+  esm_name = "WRF",
+  cm_name = "LPJmL",
+  scn_name = "rcp8p5",
   N = 200
 )
 
@@ -64,9 +64,9 @@ osiris::grid_to_basin_yield(
 # write_dir = paste0(data_folder,"/outputs_grid_to_basin_yield")
 # wheat_area = paste0(data_folder,"/winter_and_spring_wheat_areas_v1_180627.nc4")
 # crops = c("maize", "rice", "soy", "wheat")
-# esm_name = 'CanESM5'
-# cm_name = 'LPJmL'
-# scn_name = 'rcp8p5'
+# esm_name = "WRF"
+# cm_name = "LPJmL",
+# scn_name = "rcp8p5",
 # N = 200
 
 

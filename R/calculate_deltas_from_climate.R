@@ -4,7 +4,7 @@
 #'
 #' @param climate_dir Default = NULL
 #' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
-#' @param esm_name Default = 'CanESM5'
+#' @param esm_name Default = NULL
 #' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
 #' @param minlat Default = -87.8638
@@ -32,7 +32,7 @@
 
 calculate_deltas_from_climate <- function(climate_dir = NULL,
                                           write_dir = "outputs_calculate_delta_from_climate",
-                                          esm_name = 'CanESM5',
+                                          esm_name = NULL,
                                           crops = c("Corn", "Wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
                                           minlat = -87.8638,
@@ -58,6 +58,9 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
   # Check write dir
   if(!dir.exists(write_dir)){dir.create(write_dir)}
+
+  # Make a directory for growing_season_dir if not there
+  if(!dir.exists(growing_season_dir)){dir.create(growing_season_dir)}
 
   # Initialize values
   NULL -> areamask -> basePr -> baseTemp -> crop -> gslength -> hmonth ->
@@ -209,7 +212,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
         x %>%
           keep_months_and_avg(., crp=crp, irrig=irrig) %>%
-          utils::write.csv(., paste0(write_dir, '/', esm_name, '_', varname,
+          utils::write.csv(., paste0(growing_season_dir, '/', esm_name, '_', varname,
                               '_', crp, '_', irrig,
                               '_growing_season_avg.csv'),
                     row.names = F)

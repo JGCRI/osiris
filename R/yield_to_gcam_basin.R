@@ -166,52 +166,31 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   if (!is.null(extrapolate_to)) {
     rlang::inform(paste0("Extrapolating basin yield data to ", extrapolate_to))
 
+    # Change "maize" to "corn"
+    emu_data1$crop[emu_data1$crop == 'maize'] <- 'corn'
+
     # Capitalize first letter of crop column (not all capitalized before)
     emu_data1$crop <- gsub("(?<!\\w)(.)","\\U\\1", emu_data1$crop, perl = TRUE)
-
-    # Add a new column for 2100 (switch to wide then back to long)
-    emu_data1 <- emu_data1 %>%
-      tidyr::spread(year, yield) %>%
-      tibble::add_column(!! paste0(extrapolate_to) := NA) %>%
-      tidyr::gather(key="year", value="yield", -c(gcm:rcp))
 
     # Store years as numeric
     emu_data1$year <- as.numeric(emu_data1$year)
 
-    # initialize lists
-    sub.data <- list()
-    irr.data <- list()
-    crop.data <- list()
+    # Run linear extrapolation function and add future year
+    emu_data1 <- emu_data1 %>%
+      dplyr::group_by(crop, irr, id) %>%
+      dplyr::do(stats::lm( yield ~ year , data = .) %>%
+                  stats::predict(., tibble::tibble(year = extrapolate_to)) %>%
+                  tibble::tibble(year = extrapolate_to, yield = .)) %>%
+      dplyr::bind_rows(emu_data1) %>%
+      tidyr::fill(gcm, cropmodel, HA, rcp, .direction = "downup") %>%
+      dplyr::select(names(emu_data1)) %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange(crop, irr, id, year) %>%
+      dplyr::ungroup()
 
-    # Loop through each crop-irr-id combination
-    for (i in unique(emu_data1$crop)) {
-      for (j in unique(emu_data1$irr)) {
-        for (k in emu_data1$id) {
-
-          # Create a subset for each crop-irr-id one after another
-          sub <- subset(emu_data1, crop==i & irr==j & id==k)
-
-          # Extrapolate to 2100
-          # make a linear model for each basin up to year 2099
-          interpol <- stats::lm(yield ~ year, data = sub)
-
-          # calculate the linear trend  (these values will differ from original ones because of the interpolation), for year 2100 the trend will be extended (extrapolation)
-          pred <- stats::predict(interpol, sub)
-
-          # insert the last predicted yield (for 2100)
-          sub$yield[which(sub$year == extrapolate_to)] <- pred[length(pred)]
-
-          sub.data[[k]] <- sub
-        }
-        irr.data[[j]] <- dplyr::bind_rows(sub.data)
-      }
-      crop.data[[i]] <- dplyr::bind_rows(irr.data)
-    }
-
-    # Bind
-    emu_data1 <- dplyr::bind_rows(crop.data)
+    # Store years as numeric
+    emu_data1$yield <- as.numeric(emu_data1$yield)
   }
-
 
   # emu_data1 %>%
   #   dplyr::filter(cropmodel != "lpj-guess") ->
