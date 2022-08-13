@@ -85,9 +85,6 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   rlang::inform("Reading osiris netcdf file and processing...")
 
-  # Check Parameters
-  ncdf_check <- ncdf4::nc_open(osiris_ncdf)
-
   # Get raster brick for Temperature
   osiris_ncdf_brick <- raster::brick(osiris_ncdf, varname = 'tas', ncdf = TRUE)
   osiris_ncdf_ras <- osiris_ncdf_brick[[1]] # Base raster
@@ -112,7 +109,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   # Read in wrf ncdf files using a loop
   rlang::inform("Reading WRF netcdf file and processing...")
 
-  list.filepath <- list.files(path = wrf_ncdf, pattern = ".nc", full.names = T)
+  list.filepath <- list.files(path = wrf_ncdf, full.names = T)
   list.filepath <- list.filepath[order(gsub("[^0-9]+", "", list.filepath))] # Order files by time
   for(i in 1:length(list.filepath)){
     wrf_T2_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'T2', ncdf = TRUE)
