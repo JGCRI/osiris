@@ -286,7 +286,7 @@ grid_to_basin_yield <- function(carbon = NULL,
   emulatorlist <- list.files(path=emulator_dir, full.names=TRUE, recursive=FALSE)
   emulatorlist <- emulatorlist[grepl('A0', emulatorlist)] # only keep non-adaptation scenarios
 
-  inputlist <- list.files(path=input_dir, full.names=TRUE, recursive=FALSE)
+  inputlist <- list.files(path=input_dir, pattern = esm_name, full.names=TRUE, recursive=FALSE)
 
   areafilelist <- list.files(path=area_dir, full.names=TRUE, recursive=FALSE)
   # there's only 4 crops in the ggcmi phase2 emulators. Subset the area
