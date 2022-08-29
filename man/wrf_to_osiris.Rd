@@ -14,7 +14,8 @@ wrf_to_osiris(
 }
 \arguments{
 \item{wrf_ncdf}{Default = NULL. Path to WRF data, which should start at the beginning
-of a month. You can add multiple paths, just put in a list, e.g., c("/path1", "/path2")}
+of a month. You can add multiple paths, e.g., c("/HOT_NEAR", "/HOT_FAR"),
+which must be in chronological order.}
 
 \item{osiris_ncdf}{Default = NULL. Path to osiris temperature nc file.}
 

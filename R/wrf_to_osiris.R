@@ -5,7 +5,8 @@
 #' and precipitation flux, and save to a new nc file.
 #'
 #' @param wrf_ncdf Default = NULL. Path to WRF data, which should start at the beginning
-#' of a month. You can add multiple paths, just put in a list, e.g., c("/path1", "/path2")
+#' of a month. You can add multiple paths, e.g., c("/HOT_NEAR", "/HOT_FAR"),
+#' which must be in chronological order.
 #' @param osiris_ncdf Default = NULL. Path to osiris temperature nc file.
 #' @param write_dir Default = "wrf_to_osiris". Output Folder.
 #' @param time_step Default = "3 hours". Other option is "1 hour".
@@ -49,8 +50,8 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
   # of raster layers.
   wrf_fun <- function(x) {
     # Get lat and lon from raster (first file, doesn't matter since all the same lat/lon)
-    wrf_ncdf_lat <- (raster::brick(list.filepath[1], varname = 'XLAT', ncdf = TRUE))[[1]]
-    wrf_ncdf_lon <- (raster::brick(list.filepath[1], varname = 'XLONG', ncdf = TRUE))[[1]]
+    wrf_ncdf_lat <- (raster::brick(list.files(path = wrf_ncdf, full.names = T)[1], varname = 'XLAT', ncdf = TRUE))[[1]]
+    wrf_ncdf_lon <- (raster::brick(list.files(path = wrf_ncdf, full.names = T)[1], varname = 'XLONG', ncdf = TRUE))[[1]]
 
     # Get Lat long
     wrf_ncdf_lat_df <- raster::as.data.frame(wrf_ncdf_lat, xy = TRUE, na.rm = TRUE) %>%
@@ -85,121 +86,158 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   rlang::inform("Reading osiris netcdf file and processing...")
 
-  # Get raster brick for Temperature
+  # Get raster brick of osiris template (doesn't matter which variable)
   osiris_ncdf_brick <- raster::brick(osiris_ncdf, varname = 'tas', ncdf = TRUE)
   osiris_ncdf_ras <- osiris_ncdf_brick[[1]] # Base raster
 
-  # Convert raster in to an sf object ============================================
+  # Function to process precipitation data for each folder separately
+  wrf_process <- function(climate_dir) {
+    # Initiate list for WRF data raster bricks
+    wrf_T2_brick <- list()
+    wrf_RAINC_brick <- list()
+    wrf_RAINNC_brick <- list()
+    wrf_RAINSH_brick <- list()
+    time_stamp <- list()
+    wrf_out <- list()
 
-  # Step 1: convert to a table with lat, lon, and z
-  osiris_ncdf_ras_df <- raster::as.data.frame(osiris_ncdf_ras, xy = TRUE, na.rm = TRUE) %>%
-    dplyr::select(lat = y, lon = x, z = 3)
+    # Read in wrf ncdf files using a loop
+    rlang::inform("Reading WRF netcdf file and processing...")
 
-  # Step 2: convert to sf object using sf::st_as_sf
-  osiris_ncdf_sf <- osiris_ncdf_ras_df %>%
-    sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
+    list.filepath <- list.files(path = climate_dir, full.names = T)
+    list.filepath <- list.filepath[order(gsub("[^0-9]+", "", list.filepath))] # Order files by time
+    for(i in 1:length(list.filepath)){
+      wrf_T2_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'T2', ncdf = TRUE)
+      wrf_RAINC_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINC', ncdf = TRUE)
+      wrf_RAINNC_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINNC', ncdf = TRUE)
+      wrf_RAINSH_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINSH', ncdf = TRUE)
 
-  # Initiate list for WRF data raster bricks
-  wrf_T2_brick <- list()
-  wrf_RAINC_brick <- list()
-  wrf_RAINNC_brick <- list()
-  wrf_RAINSH_brick <- list()
-  time_stamp <- list()
+      # Retrieve the number of layers from each file, which is equivalent to the number
+      # of time steps, and define time stamp series
+      layer_num <- raster::nlayers(wrf_T2_brick[[i]])
+      initial_time <- as.POSIXct(paste0(substr(basename(list.filepath[i]), 12, 21), " ", substr(basename(list.filepath[i]), 23, 30)), tz = "UTC")
+      time_stamp[[i]] <- as.character(seq(from = initial_time, length.out = layer_num, by = time_step))
+    }
 
-  # Read in wrf ncdf files using a loop
-  rlang::inform("Reading WRF netcdf file and processing...")
+    # Make table of each time stamp
+    wrf_layers <- do.call(rbind, Map(data.frame, layers = time_stamp))
+    year <- substr(wrf_layers$layers, 1, 4)
+    month <- substr(wrf_layers$layers, 6, 7)
+    day <- substr(wrf_layers$layers, 9, 10)
+    hour <- substr(wrf_layers$layers, 12, 13)
+    wrf_layers <- cbind(wrf_layers, year, month, day, hour)
 
-  list.filepath <- list.files(path = wrf_ncdf, full.names = T)
-  list.filepath <- list.filepath[order(gsub("[^0-9]+", "", list.filepath))] # Order files by time
-  for(i in 1:length(list.filepath)){
-    wrf_T2_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'T2', ncdf = TRUE)
-    wrf_RAINC_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINC', ncdf = TRUE)
-    wrf_RAINNC_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINNC', ncdf = TRUE)
-    wrf_RAINSH_brick[[i]] <- raster::brick(list.filepath[[i]], varname = 'RAINSH', ncdf = TRUE)
+    # Add missing hour cells for single timestep files
+    wrf_layers$hour <- sub("^$", "00", wrf_layers$hour)
 
-    # Retrieve the number of layers from each file, which is equivalent to the number
-    # of time steps, and define time stamp series
-    layer_num <- raster::nlayers(wrf_T2_brick[[i]])
-    initial_time <- as.POSIXct(paste0(substr(basename(list.filepath[i]), 12, 21), " ", substr(basename(list.filepath[i]), 23, 30)), tz = "UTC")
-    time_stamp[[i]] <- as.character(seq(from = initial_time, length.out = layer_num, by = time_step))
+    # Find duplicate time stamps to remove from raster stacks (this prevents double
+    # counting time stamps when finding monthly mean temperature)
+    duplicate_layers <- which(duplicated(wrf_layers[c("year", "month", "day", "hour")]),)
+    wrf_layers <- dplyr::distinct(wrf_layers)
+
+    #.........................
+    # Process temperature data
+    #.........................
+
+    # Collapse raster brick list to get single raster stack
+    wrf_T2 <- raster::stack(wrf_T2_brick)
+
+    # Remove duplicate layers
+    wrf_T2 <- raster::dropLayer(wrf_T2, duplicate_layers)
+
+    # Get unique id for each year-month combo
+    wrf_layers <- wrf_layers %>%
+      dplyr::group_by(year, month) %>%
+      dplyr::mutate(id = dplyr::cur_group_id())
+
+    # Create subset of raster layers based on year-month id. We drop the last year-
+    # month id since we want the temperature time steps to match with precipitation,
+    # which will be the delta from the beginning of the month to the next, so it won't
+    # include the last time step.
+    wrf_T2_sub <- list()
+    for (i in 1:(length(unique(wrf_layers$id))-1)) {
+      wrf_T2_sub[[i]] <- raster::subset(wrf_T2, dplyr::first(which(wrf_layers$id == i)):dplyr::last(which(wrf_layers$id == i)))
+    }
+
+    # Calculate monthly mean temperature
+    wrf_T2_mean <- lapply(wrf_T2_sub, raster::mean)
+
+    wrf_out[[1]] <- wrf_T2_mean
+
+    #.........................
+    # Process precipitation data
+    #.........................
+
+    # Collapse raster brick list to get single raster stack
+    wrf_RAINC <- raster::stack(wrf_RAINC_brick)
+    wrf_RAINNC <- raster::stack(wrf_RAINNC_brick)
+    wrf_RAINSH <- raster::stack(wrf_RAINSH_brick)
+
+    # Remove duplicate layers
+    wrf_RAINC <- raster::dropLayer(wrf_RAINC, duplicate_layers)
+    wrf_RAINNC <- raster::dropLayer(wrf_RAINNC, duplicate_layers)
+    wrf_RAINSH <- raster::dropLayer(wrf_RAINSH, duplicate_layers)
+
+    # Extract layers from table corresponding to the beginning of each month
+    wrf_layers_sub <- wrf_layers[match(unique(wrf_layers$id), wrf_layers$id),]
+
+    # Extract raster layers corresponding to the beginning of each month for each
+    # precipitation variable
+    wrf_RAINC <- raster::subset(wrf_RAINC, match(unique(wrf_layers$id), wrf_layers$id))
+    wrf_RAINNC <- raster::subset(wrf_RAINNC, match(unique(wrf_layers$id), wrf_layers$id))
+    wrf_RAINSH <- raster::subset(wrf_RAINSH, match(unique(wrf_layers$id), wrf_layers$id))
+
+    # Sum precipitation variables to get total cumulative precipitation (mm)
+    wrf_RAIN <- wrf_RAINC + wrf_RAINNC + wrf_RAINSH
+
+    # Get the monthly delta and calculate precipitation from mm to flux (just divide
+    # by number of seconds in each monthly interval, since density and m to mm cancel
+    # out, assuming a water density of 1000 kg/m3)
+    wrf_precip <- list()
+    for (i in 1:(raster::nlayers(wrf_RAIN) - 1)) {
+      wrf_precip[[i]] <- wrf_RAIN[[i+1]] - wrf_RAIN[[i]]
+      month_to_sec <- as.numeric(difftime(wrf_layers_sub$layers[i+1], wrf_layers_sub$layers[i], units = "secs"))
+      wrf_precip[[i]] <- wrf_precip[[i]] / month_to_sec
+    }
+
+    wrf_out[[2]] <- wrf_precip
+    return(wrf_out)
   }
 
-  # Make table of each time stamp
-  wrf_layers <- do.call(rbind, Map(data.frame, layers = time_stamp))
-  year <- substr(wrf_layers$layers, 1, 4)
-  month <- substr(wrf_layers$layers, 6, 7)
-  day <- substr(wrf_layers$layers, 9, 10)
-  hour <- substr(wrf_layers$layers, 12, 13)
-  wrf_layers <- cbind(wrf_layers, year, month, day, hour)
+  # Processes each netcdf file as a separate entry in the list. For each listed item,
+  # temperature is the first and precipitation is the second sub item.
+  wrf_out_int <- lapply(wrf_ncdf, wrf_process)
 
-  # Find duplicate time stamps to remove from raster stacks (this prevents double
-  # counting time stamps when finding monthly mean temperature)
-  duplicate_layers <- which(duplicated(wrf_layers$layers),)
-  wrf_layers <- dplyr::distinct(wrf_layers)
+  # Combines all temperature and all precipitation into two separate lists. The first
+  # listed item is temperature and the second is precipitation.
+  wrf_out_fin <- do.call(Map, c(c, wrf_out_int))
 
-  # Collapse raster brick list to get single raster stack
-  wrf_T2 <- raster::stack(wrf_T2_brick)
+  # Generate list of monthly timesteps for each netcdf file
+  monthly_timestamp <- list()
 
-  # Remove duplicate layers
-  wrf_T2 <- raster::dropLayer(wrf_T2, duplicate_layers)
+  for (i in 1:length(wrf_ncdf)) {
+    first_file <- utils::head(list.files(path = wrf_ncdf[i], full.names = T), 1)
+    initial_time <- as.POSIXct(paste0(substr(basename(first_file), 12, 21), " ", substr(basename(first_file), 23, 30)), tz = "UTC")
+    time_stamp <- as.character(seq(from = initial_time, length.out = length(wrf_out_int[[i]][[1]]), by = "1 month"))
+    monthly_timestamp[[i]] <- time_stamp
 
-  # Get unique id for each year-month combo
-  wrf_layers <- wrf_layers %>%
-    dplyr::group_by(year, month) %>%
-    dplyr::mutate(id = dplyr::cur_group_id())
-
-  # Create subset of raster layers based on year-month id. We drop the last year-
-  # month id since we want the temperature time steps to match with precipitation,
-  # which will be the delta from the beginning of the month to the next, so it won't
-  # include the last time step.
-  wrf_T2_sub <- list()
-  for (i in 1:(length(unique(wrf_layers$id))-1)) {
-    wrf_T2_sub[[i]] <- raster::subset(wrf_T2, dplyr::first(which(wrf_layers$id == i)):dplyr::last(which(wrf_layers$id == i)))
   }
 
-  # Calculate monthly mean temperature
-  wrf_T2_mean <- lapply(wrf_T2_sub, raster::mean)
+  # Generate data frame of each monthly timestep
+  monthly_layers <- do.call(rbind, Map(data.frame, layers = monthly_timestamp))
+
+  # Identify duplicate layers like before and remove corresponding raster layers
+  duplicate_layers <- which(duplicated(monthly_layers),)
+  wrf_temp <- raster::stack(wrf_out_fin[[1]])
+  wrf_temp <- raster::dropLayer(wrf_temp, duplicate_layers)
+  wrf_temp <- raster::as.list(wrf_temp)
+
+  wrf_precip <- raster::stack(wrf_out_fin[[2]])
+  wrf_precip <- raster::dropLayer(wrf_precip, duplicate_layers)
+  wrf_precip <- raster::as.list(wrf_precip)
 
   # Apply reprojection function on temperature data
   rlang::inform("Reprojecting WRF temperature data...")
-  wrf_T2_ras <- lapply(wrf_T2_mean, wrf_fun)
-
-
-  #.........................
-  # Process precipitation data
-  #.........................
-
-  # Collapse raster brick list to get single raster stack
-  wrf_RAINC <- raster::stack(wrf_RAINC_brick)
-  wrf_RAINNC <- raster::stack(wrf_RAINNC_brick)
-  wrf_RAINSH <- raster::stack(wrf_RAINSH_brick)
-
-  # Remove duplicate layers
-  wrf_RAINC <- raster::dropLayer(wrf_RAINC, duplicate_layers)
-  wrf_RAINNC <- raster::dropLayer(wrf_RAINNC, duplicate_layers)
-  wrf_RAINSH <- raster::dropLayer(wrf_RAINSH, duplicate_layers)
-
-  # Extract layers from table corresponding to the beginning of each month
-  wrf_layers_sub <- wrf_layers[match(unique(wrf_layers$id), wrf_layers$id),]
-
-  # Extract raster layers corresponding to the beginning of each month for each
-  # precipitation variable
-  wrf_RAINC <- raster::subset(wrf_RAINC, match(unique(wrf_layers$id), wrf_layers$id))
-  wrf_RAINNC <- raster::subset(wrf_RAINNC, match(unique(wrf_layers$id), wrf_layers$id))
-  wrf_RAINSH <- raster::subset(wrf_RAINSH, match(unique(wrf_layers$id), wrf_layers$id))
-
-  # Sum precipitation variables to get total cumulative precipitation (mm)
-  wrf_RAIN <- wrf_RAINC + wrf_RAINNC + wrf_RAINSH
-
-  # Get the monthly delta and calculate precipitation from mm to flux (just divide
-  # by number of seconds in each monthly interval, since density and m to mm cancel
-  # out, assuming a water density of 1000 kg/m3)
-  wrf_precip <- list()
-  for (i in 1:(raster::nlayers(wrf_RAIN) - 1)) {
-    wrf_precip[[i]] <- wrf_RAIN[[i+1]] - wrf_RAIN[[i]]
-    month_to_sec <- as.numeric(difftime(wrf_layers_sub$layers[i+1], wrf_layers_sub$layers[i], units = "secs"))
-    wrf_precip[[i]] <- wrf_precip[[i]] / month_to_sec
-  }
+  wrf_T2_ras <- lapply(wrf_temp, wrf_fun)
 
   # Apply reprojection function on precipitation flux
   rlang::inform("Reprojecting WRF precipitation data...")
@@ -229,7 +267,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   # Time component
   time <- ncdf4::ncdim_def(name = "time",
-                           units = paste0("months since ", substr(wrf_layers$layers[1], 1, 10)),
+                           units = paste0("months since ", monthly_layers$layers[1]),
                            vals = 0:(raster::nlayers(wrf_temperature)-1),
                            unlim = TRUE,
                            longname = "time")
