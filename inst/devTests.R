@@ -79,10 +79,13 @@ osiris::yield_to_gcam_basin(
 # Tests for Step 4: create_AgProdChange_xml
 osiris::create_AgProdChange_xml(
   write_dir = paste0(data_folder,"/outputs_create_AgProdChange_xml"),
-  ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_ag_irr_ref.csv"),
+  esm_name = 'WRF',
+  scn_name = 'rcp8p5_hot',
+  ssp = 'ssp5',
+  ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_irr_high.csv"),
   bio_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"),
-  ag_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
-  bio_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  ag_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/ag_impacts_WRF_rcp8p5_hot_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  bio_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/bio_impacts_WRF_rcp8p5_hot_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
   GCAM_region_mapping = paste0(data_folder,"/mapping_data/GCAM_region_names.csv"),
   timestep = 5,
   maxHistYear = 2010,
