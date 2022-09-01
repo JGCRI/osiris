@@ -148,7 +148,7 @@ grid_to_basin_yield <- function(carbon = NULL,
   ##       for what the paper Franke et al needs.
   # This is not fast, it's evaluating a polynomial at every grid
   # point in every year
-  eval_yield <- function(inputs, params, matched_grids){
+  eval_yield <- function(inputs, params, matched_grids, irrig=F){
 
     # Because my climate data (inputs) Is on a coarser grid than
     # my crop data (params), I have to do an apply over the crop
@@ -160,60 +160,100 @@ grid_to_basin_yield <- function(carbon = NULL,
       params
     params_list <- split(params, f=params$split_id)
 
-    yields <- do.call(rbind, lapply(params_list, function(param_row){
-      # param_row <- params_list[[1]]
+    # For irrigated crops, yield is calculated by applying the 19 non-NA variables
+    # to the 19 terms in GMD paper eqn 1 that don't have W (precipitation) terms
+    # in them.
+    if(irrig == T){
+      yields <- do.call(rbind, lapply(params_list, function(param_row){
+        # param_row <- params_list[[1]]
 
-      matched_grids %>%
-        dplyr::filter(crop_lon == param_row$lon,
-                      crop_lat == param_row$lat) ->
-        matched_point
+        matched_grids %>%
+          dplyr::filter(crop_lon == param_row$lon,
+                        crop_lat == param_row$lat) ->
+          matched_point
 
-      inputs %>%
-        dplyr::filter(lon == matched_point$clim_lon,
-                      lat == matched_point$clim_lat ) %>%
-        dplyr::mutate(crop_lon = matched_point$crop_lon,
-                      crop_lat = matched_point$crop_lat,
-                      ## TODO: double check this with eqn 1 in franke et al
-                      yield = param_row$`1`+
-                        param_row$`2`*C +
-                        param_row$`3`*deltaT +
-                        param_row$`4`*deltaP +
-                        param_row$`5`*N +
-                        param_row$`6`*C*C +
-                        param_row$`7`*C*deltaT +
-                        param_row$`8`*C*deltaP +
-                        param_row$`9`*C*N +
-                        param_row$`10`*deltaT*deltaT +
-                        param_row$`11`*deltaT*deltaP +
-                        param_row$`12`*deltaT*N +
-                        param_row$`13`*deltaP*deltaP +
-                        param_row$`14`*deltaP*N +
-                        param_row$`15`*N*N +
-                        param_row$`16`*C*C*C +
-                        param_row$`17`*C*C*deltaT +
-                        param_row$`18`*C*C*deltaP +
-                        param_row$`19`*C*C*N +
-                        param_row$`20`*C*deltaT*deltaT +
-                        param_row$`21`*C*deltaT*deltaP +
-                        param_row$`22`*C*deltaT*N +
-                        param_row$`23`*C*deltaP*deltaP +
-                        param_row$`24`*C*deltaP*N +
-                        param_row$`25`*C*N*N +
-                        param_row$`26`*deltaT*deltaT*deltaT +
-                        param_row$`27`*deltaT*deltaT*deltaP +
-                        param_row$`28`*deltaT*deltaT*N +
-                        param_row$`29`*deltaT*deltaP*deltaP +
-                        param_row$`30`*deltaT*deltaP*N +
-                        param_row$`31`*deltaT*N*N +
-                        param_row$`32`*deltaP*deltaP*deltaP +
-                        param_row$`33`*deltaP*deltaP*N +
-                        param_row$`34`*deltaP*N*N
-        ) ->
-        yield
-      return(yield)
-    }))
+        inputs %>%
+          dplyr::filter(lon == matched_point$clim_lon,
+                        lat == matched_point$clim_lat ) %>%
+          dplyr::mutate(crop_lon = matched_point$crop_lon,
+                        crop_lat = matched_point$crop_lat,
+                        yield = param_row$`1` +
+                          param_row$`2`*C +
+                          param_row$`3`*deltaT +
+                          param_row$`4`*N +
+                          param_row$`5`*C^2 +
+                          param_row$`6`*C*deltaT +
+                          param_row$`7`*C*N +
+                          param_row$`8`*deltaT^2 +
+                          param_row$`9`*deltaT*N +
+                          param_row$`10`*N^2 +
+                          param_row$`11`*C^3 +
+                          param_row$`12`*C^2*deltaT +
+                          param_row$`13`*C^2*N +
+                          param_row$`14`*C*deltaT^2 +
+                          param_row$`15`*C*deltaT*N +
+                          param_row$`16`*C*N^2 +
+                          param_row$`17`*deltaT^3 +
+                          param_row$`18`*deltaT^2*N +
+                          param_row$`19`*deltaT*N^2
+          ) ->
+          yield
+        return(yield)
+      }))
+    } else if (irrig == F) {
+      yields <- do.call(rbind, lapply(params_list, function(param_row){
+        # param_row <- params_list[[1]]
+
+        matched_grids %>%
+          dplyr::filter(crop_lon == param_row$lon,
+                        crop_lat == param_row$lat) ->
+          matched_point
+
+        inputs %>%
+          dplyr::filter(lon == matched_point$clim_lon,
+                        lat == matched_point$clim_lat ) %>%
+          dplyr::mutate(crop_lon = matched_point$crop_lon,
+                        crop_lat = matched_point$crop_lat,
+                        yield = param_row$`1` +
+                          param_row$`2`*C +
+                          param_row$`3`*deltaT +
+                          param_row$`4`*deltaP +
+                          param_row$`5`*N +
+                          param_row$`6`*C^2 +
+                          param_row$`7`*C*deltaT +
+                          param_row$`8`*C*deltaP +
+                          param_row$`9`*C*N +
+                          param_row$`10`*deltaT^2 +
+                          param_row$`11`*deltaT*deltaP +
+                          param_row$`12`*deltaT*N +
+                          param_row$`13`*deltaP^2 +
+                          param_row$`14`*deltaP*N +
+                          param_row$`15`*N^2 +
+                          param_row$`16`*C^3 +
+                          param_row$`17`*C^2*deltaT +
+                          param_row$`18`*C^2*deltaP +
+                          param_row$`19`*C^2*N +
+                          param_row$`20`*C*deltaT^2 +
+                          param_row$`21`*C*deltaT*deltaP +
+                          param_row$`22`*C*deltaT*N +
+                          param_row$`23`*C*deltaP^2 +
+                          param_row$`24`*C*deltaP*N +
+                          param_row$`25`*C*N^2 +
+                          param_row$`26`*deltaT^3 +
+                          param_row$`27`*deltaT^2*deltaP +
+                          param_row$`28`*deltaT^2*N +
+                          param_row$`29`*deltaT*deltaP^2 +
+                          param_row$`30`*deltaT*deltaP*N +
+                          param_row$`31`*deltaT*N^2 +
+                          param_row$`32`*deltaP^3 +
+                          param_row$`33`*deltaP^2*N +
+                          param_row$`34`*deltaP*N^2
+          ) ->
+          yield
+        return(yield)
+      }))
+    }
     row.names(yields) <- NULL
-
     return(yields %>%
              dplyr::select(crop, irr, crop_lon, crop_lat, year, yield))
   }
@@ -670,34 +710,37 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     # Test the inputs
-    rf_inputs %>%
-      dplyr::select(lon, lat, crop, irr) %>%
-      dplyr::distinct() %>%
-      dplyr::mutate(deltaT=0,
-                    deltaP=1,
-                    N=200,
-                    C=360,
-                    year = 1985) -> # year shouldn't matter
-      test_inputs1
+    # rf_inputs %>%
+    #   dplyr::select(lon, lat, crop, irr) %>%
+    #   dplyr::distinct() %>%
+    #   dplyr::mutate(deltaT=0,
+    #                 deltaP=1,
+    #                 N=200,
+    #                 C=360,
+    #                 year = 1985) -> # year shouldn't matter
+    #   test_inputs1
+    #
+    # test_inputs <- test_inputs1[3:4,]
+    #
+    # test_yields <- eval_yield(inputs=test_inputs, params=rf_params, matched_grids = rf_matched_grids)
 
-    test_inputs <- test_inputs1[3:4,]
 
-    test_yields <- eval_yield(inputs=test_inputs, params=rf_params, matched_grids = rf_matched_grids)
-
-
-    ir_yields <- eval_yield(inputs=ir_inputs, params=ir_params, matched_grids = ir_matched_grids) %>%
+    ir_yields <- eval_yield(inputs=ir_inputs, params=ir_params, matched_grids = ir_matched_grids, irrig=T) %>%
       dplyr::mutate(gcm = esm_name,
                     cropmodel = cm_name) %>%
       dplyr::rename(lon = crop_lon,
                     lat = crop_lat)
 
-    rf_yields <- eval_yield(inputs=rf_inputs, params=rf_params, matched_grids = rf_matched_grids) %>%
+    rf_yields <- eval_yield(inputs=rf_inputs, params=rf_params, matched_grids = rf_matched_grids, irrig=F) %>%
       dplyr::mutate(gcm = esm_name,
                     cropmodel = cm_name) %>%
       dplyr::rename(lon = crop_lon,
                     lat = crop_lat)
 
 
+    # Replace negative yields with zero
+    ir_yields$yield[ir_yields$yield < 0] <- 0
+    rf_yields$yield[rf_yields$yield < 0] <- 0
 
     # So now we have a data frame of yields for each grid cell in each year
     # for the grid cells from the finest mesh.
