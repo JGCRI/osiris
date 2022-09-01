@@ -11,6 +11,8 @@ yield_to_gcam_basin(
   FAO_ag_mapping = NULL,
   iso_harvest_area_mapping = NULL,
   iso_GCAM_basin_mapping = NULL,
+  esm_name = "WRF",
+  scn_name = "rcp8p5_hot",
   max_CCImult = 2.5,
   min_CCImult = 0.01,
   weight_floor_ha = 1,
@@ -33,6 +35,10 @@ yield_to_gcam_basin(
 \item{iso_harvest_area_mapping}{Default = NULL}
 
 \item{iso_GCAM_basin_mapping}{Default = NULL}
+
+\item{esm_name}{Default = 'WRF'}
+
+\item{scn_name}{Default = 'rcp8p5_hot'}
 
 \item{max_CCImult}{Default = 2.5 Upper limit on positive climate impacts (multiplier)}
 

@@ -13,9 +13,9 @@
 #' @param write_dir Default = "outputs_grid_to_basin_yield". Output Folder
 #' @param wheat_area Default = NULL Spring and winter wheat areas
 #' @param crops Default = c("maize", "rice", "soy", "wheat")
-#' @param esm_name Default = 'CanESM5'
+#' @param esm_name Default = 'WRF'
 #' @param cm_name Default = 'LPJmL'
-#' @param scn_name Default = 'rcp8p5'
+#' @param scn_name Default = 'rcp8p5_hot'
 #' @param N Default = 200. Assuming nothing is nitrogen limited and apply across grids
 #' @keywords test
 #' @return number
@@ -38,9 +38,9 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 write_dir = "outputs_grid_to_basin_yield",
                                 wheat_area = NULL,
                                 crops = c("maize", "rice", "soy", "wheat"),
-                                esm_name = 'CanESM5',
+                                esm_name = 'WRF',
                                 cm_name = 'LPJmL',
-                                scn_name = 'rcp8p5',
+                                scn_name = 'rcp8p5_hot',
                                 N = 200) {
 
 
