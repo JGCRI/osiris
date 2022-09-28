@@ -259,8 +259,8 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       # get the T and P growing season average files loaded for this crop-irr combo:
       filenames <- list.files(growing_season_dir, pattern = esm_name, full.names=TRUE, recursive=FALSE)
       filenames <- filenames[grepl(paste0(crp, '_', irrig), filenames)]
-      tas_file <- filenames[grepl('tas', filenames)]
-      pr_file <- filenames[grepl('pr', filenames)]
+      tas_file <- filenames[grepl('_tas_', filenames)]
+      pr_file <- filenames[grepl('_pr_', filenames)]
 
       tas <- utils::read.csv(tas_file, stringsAsFactors = F)
       pr <- utils::read.csv(pr_file, stringsAsFactors = F)
