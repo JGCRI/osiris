@@ -93,3 +93,16 @@ osiris::create_AgProdChange_xml(
   appliedto = "full"
 )
 
+
+# Tests for diagnostic_plots
+osiris::diagnostic_plots(
+  hot_ssp3_apc = paste0(data_folder,"/outputs_create_AgProdChange_xml/ag_prodchange_rcp8p5_hot_ssp3_WRF_LPJmL.csv"),
+  hot_ssp5_apc = paste0(data_folder,"/outputs_create_AgProdChange_xml/ag_prodchange_rcp8p5_hot_ssp5_WRF_LPJmL.csv"),
+  cold_ssp3_apc = paste0(data_folder,"/outputs_create_AgProdChange_xml/ag_prodchange_rcp8p5_cold_ssp3_WRF_LPJmL.csv"),
+  cold_ssp5_apc = paste0(data_folder,"/outputs_create_AgProdChange_xml/ag_prodchange_rcp8p5_cold_ssp5_WRF_LPJmL.csv"),
+  reference_apc = paste0(data_folder,"/gcamdata_files/ag_prodchange_ref_IRR_MGMT.csv"),
+  agyield = paste0(data_folder,"/gcamdata_files/L101.ag_Yield_kgm2_R_C_Y_GLU.csv"),
+  iso_GCAM_basin_mapping = paste0(data_folder,"/mapping_data/gcam_basin_ids.csv"),
+  write_dir = paste0(data_folder,"/outputs_diagnostic_plots")
+)
+
