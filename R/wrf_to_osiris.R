@@ -114,7 +114,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
       # Retrieve the number of layers from each file, which is equivalent to the number
       # of time steps, and define time stamp series
       layer_num <- raster::nlayers(wrf_T2_brick[[i]])
-      initial_time <- as.POSIXct(paste0(substr(basename(list.filepath[i]), 12, 21), " ", substr(basename(list.filepath[i]), 23, 30)), tz = "UTC")
+      initial_time <- as.POSIXct(paste0(substr(basename(list.filepath[i]), 34, 43), " ", gsub("_", ":", substr(basename(list.filepath[i]), 45, 52))), tz = "UTC")
       time_stamp[[i]] <- as.character(seq(from = initial_time, length.out = layer_num, by = time_step))
     }
 
@@ -216,7 +216,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
 
   for (i in 1:length(wrf_ncdf)) {
     first_file <- utils::head(list.files(path = wrf_ncdf[i], full.names = T), 1)
-    initial_time <- as.POSIXct(paste0(substr(basename(first_file), 12, 21), " ", substr(basename(first_file), 23, 30)), tz = "UTC")
+    initial_time <- as.POSIXct(paste0(substr(basename(first_file), 34, 43), " ", gsub("_", ":", substr(basename(first_file), 45, 52))), tz = "UTC")
     time_stamp <- as.character(seq(from = initial_time, length.out = length(wrf_out_int[[i]][[1]]), by = "1 month"))
     monthly_timestamp[[i]] <- time_stamp
 
