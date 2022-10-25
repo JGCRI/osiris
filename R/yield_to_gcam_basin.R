@@ -318,8 +318,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::summarise(impact = stats::weighted.mean(impact, HA),
                      base = stats::weighted.mean(base, HA)) %>%
     dplyr::ungroup() %>%
-    # ### streamline next two
-    # dplyr::mutate(impact = dplyr::if_else(impact > max_CCImult, max_CCImult, impact)) %>%
+    dplyr::mutate(impact = dplyr::if_else(impact > max_CCImult, max_CCImult, impact)) %>%
     dplyr::mutate(impact = dplyr::if_else(impact < min_CCImult, min_CCImult, impact)) ->
     ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears
 
