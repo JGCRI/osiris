@@ -179,10 +179,10 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     # Store years as numeric
     emu_data1$year <- as.numeric(emu_data1$year)
 
-    # Run linear extrapolation function and add future year
+    # Run extrapolation function based on Local Polynomial Regression Fitting and add future year
     emu_data1 <- emu_data1 %>%
       dplyr::group_by(crop, irr, id) %>%
-      dplyr::do(stats::lm( yield ~ year , data = .) %>%
+      dplyr::do(stats::loess( yield ~ year , control = stats::loess.control(surface = "direct"), data = .) %>%
                   stats::predict(., tibble::tibble(year = extrapolate_to)) %>%
                   tibble::tibble(year = extrapolate_to, yield = .)) %>%
       dplyr::bind_rows(emu_data1) %>%
