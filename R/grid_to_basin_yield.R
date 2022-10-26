@@ -603,9 +603,8 @@ grid_to_basin_yield <- function(carbon = NULL,
                         ))
       )
       rm(ir_params_3d_array)
-
+      ncdf4::nc_close(ncin)
     }
-    ncdf4::nc_close(ncin)
 
     # The crop responses include every grid cells, even ones with 0 response.
     # Drop the cells with 0 response to speed things up.
