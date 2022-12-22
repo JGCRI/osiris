@@ -11,13 +11,16 @@ yield_to_gcam_basin(
   FAO_ag_mapping = NULL,
   iso_harvest_area_mapping = NULL,
   iso_GCAM_basin_mapping = NULL,
+  esm_name = "WRF",
+  scn_name = "rcp8p5_hot",
   max_CCImult = 2.5,
   min_CCImult = 0.01,
   weight_floor_ha = 1,
   rolling_avg_years = 15,
   maxHistYear = 2010,
   minFutYear = 2015,
-  maxFutYear = 2100
+  maxFutYear = 2100,
+  extrapolate_to = NULL
 )
 }
 \arguments{
@@ -33,6 +36,10 @@ yield_to_gcam_basin(
 
 \item{iso_GCAM_basin_mapping}{Default = NULL}
 
+\item{esm_name}{Default = 'WRF'}
+
+\item{scn_name}{Default = 'rcp8p5_hot'}
+
 \item{max_CCImult}{Default = 2.5 Upper limit on positive climate impacts (multiplier)}
 
 \item{min_CCImult}{Default = 0.01 Lower limit on negative climate impacts (multiplier)}
@@ -46,6 +53,8 @@ yield_to_gcam_basin(
 \item{minFutYear}{Default = 2015 Min future year for which to apply rolling averages}
 
 \item{maxFutYear}{Default = 2100 Max future year for which to apply rolling averages}
+
+\item{extrapolate_to}{Default = NULL. Note that this extrapolates to only one future year (eg, 2099 to 2100)}
 }
 \value{
 number

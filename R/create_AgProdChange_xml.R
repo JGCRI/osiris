@@ -4,6 +4,9 @@
 #' updates and saves the new AgProdChange csv and xml files.
 #'
 #' @param write_dir Default = "outputs_create_AgProdChange_xml". Output Folder
+#' @param esm_name Default = 'WRF'
+#' @param scn_name Default = 'rcp8p5_hot'
+#' @param ssp Default = 'ssp3'
 #' @param ag_irr_ref Default = NULL
 #' @param bio_irr_ref Default = NULL
 #' @param ag_impacts Default = NULL
@@ -27,6 +30,9 @@
 #' }
 
 create_AgProdChange_xml <- function(write_dir = "outputs_create_AgProdChange_xml",
+                                    esm_name = 'WRF',
+                                    scn_name = 'rcp8p5_hot',
+                                    ssp = 'ssp3',
                                     ag_irr_ref = NULL,
                                     bio_irr_ref = NULL,
                                     ag_impacts = NULL,
@@ -383,14 +389,14 @@ create_AgProdChange_xml <- function(write_dir = "outputs_create_AgProdChange_xml
       dplyr::select(-rcp, -gcm, -cropmodel, -scenID) ->
       A
 
-    write.table_with_header(A, paste0(write_dir, "/ag_prodchange_", rcp, "_", gcm, "_", cm, ".csv"),
+    write.table_with_header(A, paste0(write_dir, "/ag_prodchange_", scn_name, "_", ssp, "_", esm_name, "_", cm, ".csv"),
                             paste(c("INPUT_TABLE,,,,,",  "Variable ID,,,,,", "AgProdChange,,,,,", ",,,,,")),
                             sep = ",", quote = FALSE, row.names=FALSE)
 
 
     # # What SHOULD work to write xml in same loop; doesn't work on windows yet
     # options("gcamdata.use_java"=TRUE)
-    # gcamdata::create_xml(paste0(datapath, "/ag_prodchange_", rcp, "_", gcm, "_", cm, "1",xml_end)) %>%
+    # gcamdata::create_xml(paste0(datapath, "/ag_prodchange_", scn_name, "_", ssp, "_", esm_name, "_", cm, "1",xml_end)) %>%
     #   gcamdata::add_xml_data(A, "AgProdChange") %>%
     #   gcamdata::run_xml_conversion()
 
@@ -399,7 +405,7 @@ create_AgProdChange_xml <- function(write_dir = "outputs_create_AgProdChange_xml
   # write out xml file
   options("gcamdata.use_java"=TRUE)
 
-  filelist <- list.files(path=write_dir, full.names=TRUE, recursive=FALSE)
+  filelist <- list.files(path=write_dir, pattern = paste0(scn_name, "_", ssp, "_", esm_name), full.names=TRUE, recursive=FALSE)
   filelist <- filelist[!(grepl(".xml", filelist, fixed=TRUE))]
 
   invisible(foreach::foreach(f = filelist) %do% {

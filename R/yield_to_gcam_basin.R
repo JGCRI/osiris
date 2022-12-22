@@ -9,6 +9,8 @@
 #' @param FAO_ag_mapping Default = NULL
 #' @param iso_harvest_area_mapping Default = NULL
 #' @param iso_GCAM_basin_mapping Default = NULL
+#' @param esm_name Default = 'WRF'
+#' @param scn_name Default = 'rcp8p5_hot'
 #' @param max_CCImult Default = 2.5 Upper limit on positive climate impacts (multiplier)
 #' @param min_CCImult Default = 0.01 Lower limit on negative climate impacts (multiplier)
 #' @param weight_floor_ha Default = 1 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units.
@@ -16,6 +18,7 @@
 #' @param maxHistYear Default = 2010 Historical year for which to apply rolling averages
 #' @param minFutYear Default = 2015 Min future year for which to apply rolling averages
 #' @param maxFutYear Default = 2100 Max future year for which to apply rolling averages
+#' @param extrapolate_to Default = NULL. Note that this extrapolates to only one future year (eg, 2099 to 2100)
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -33,13 +36,16 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
                                 FAO_ag_mapping = NULL,
                                 iso_harvest_area_mapping = NULL,
                                 iso_GCAM_basin_mapping = NULL,
+                                esm_name = "WRF",
+                                scn_name = "rcp8p5_hot",
                                 max_CCImult = 2.5,
                                 min_CCImult = 0.01,
                                 weight_floor_ha = 1,
                                 rolling_avg_years = 15,
                                 maxHistYear = 2010,
                                 minFutYear = 2015,
-                                maxFutYear = 2100) {
+                                maxFutYear = 2100,
+                                extrapolate_to = NULL) {
 
 
 
@@ -139,7 +145,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     iso_GCAM_basinID
 
   # reading emulated basin yield files in a loop
-  emufiles.list <- list.files( emulated_basin_yield_dir, full.names=TRUE, recursive=FALSE)
+  emufiles.list <- list.files(path=emulated_basin_yield_dir, pattern=paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
   # emufiles.list <- sub( ".csv", "", emufiles.list )
   emufiles <- list()
 
@@ -152,6 +158,43 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   tibble::as_tibble(emu_data1) %>%
     dplyr::mutate_if(is.factor, as.character) ->
     emu_data1
+
+
+
+  #.........................
+  # Extrapolate
+  #.........................
+
+  # Example of extrapolating from 2099 to 2100:
+
+  if (!is.null(extrapolate_to)) {
+    rlang::inform(paste0("Extrapolating basin yield data to ", extrapolate_to))
+
+    # Change "maize" to "corn"
+    emu_data1$crop[emu_data1$crop == 'maize'] <- 'corn'
+
+    # Capitalize first letter of crop column (not all capitalized before)
+    emu_data1$crop <- gsub("(?<!\\w)(.)","\\U\\1", emu_data1$crop, perl = TRUE)
+
+    # Store years as numeric
+    emu_data1$year <- as.numeric(emu_data1$year)
+
+    # Run extrapolation function based on Local Polynomial Regression Fitting and add future year
+    emu_data1 <- emu_data1 %>%
+      dplyr::group_by(crop, irr, id) %>%
+      dplyr::do(stats::loess( yield ~ year , control = stats::loess.control(surface = "direct"), data = .) %>%
+                  stats::predict(., tibble::tibble(year = extrapolate_to)) %>%
+                  tibble::tibble(year = extrapolate_to, yield = .)) %>%
+      dplyr::bind_rows(emu_data1) %>%
+      tidyr::fill(gcm, cropmodel, HA, rcp, .direction = "downup") %>%
+      dplyr::select(names(emu_data1)) %>%
+      dplyr::ungroup() %>%
+      dplyr::arrange(crop, irr, id, year) %>%
+      dplyr::ungroup()
+
+    # Store years as numeric
+    emu_data1$yield <- as.numeric(emu_data1$yield)
+  }
 
   # emu_data1 %>%
   #   dplyr::filter(cropmodel != "lpj-guess") ->
@@ -275,8 +318,6 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::summarise(impact = stats::weighted.mean(impact, HA),
                      base = stats::weighted.mean(base, HA)) %>%
     dplyr::ungroup() %>%
-    # ### streamline next two
-    # dplyr::mutate(impact = dplyr::if_else(impact > max_CCImult, max_CCImult, impact)) %>%
     dplyr::mutate(impact = dplyr::if_else(impact < min_CCImult, min_CCImult, impact)) ->
     ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears
 
@@ -321,6 +362,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   ag_tmp %>%
     dplyr::left_join(ag_tmp1, by = c("rcp", "gcm", "cropmodel", "GCAM_region_ID", "GLU", "GLU_name", "GCAM_commodity", "irr"))  %>%
     dplyr::mutate(impact = dplyr::if_else(outlier == TRUE, maximp, impact)) %>%
+    dplyr::mutate(impact = dplyr::if_else(impact > max_CCImult, max_CCImult, impact)) %>%
     dplyr::select(-outlier, -maxyr, -maximp) ->
     ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1
 
@@ -329,7 +371,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
 
 
   # #Bioenergy climate change impacts: use the median of the other crops
-  # again update to keep irrigation and no AEZ info; alsoadd the GCAM_commodity label here, not done in original
+  # again update to keep irrigation and no AEZ info; also add the GCAM_commodity label here, not done in original
   ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1 %>%
     dplyr::ungroup() %>%
     dplyr::select(-GCAM_commodity) %>%
@@ -344,8 +386,8 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
 
 
   # write
-  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
-  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/ag_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/bio_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
 
 
   rlang::inform("yield_to_gcam_basin complete.")

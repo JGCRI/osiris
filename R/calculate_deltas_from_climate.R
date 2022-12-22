@@ -4,7 +4,7 @@
 #'
 #' @param climate_dir Default = NULL
 #' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
-#' @param esm_name Default = 'CanESM5'
+#' @param esm_name Default = NULL
 #' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
 #' @param minlat Default = -87.8638
@@ -13,6 +13,12 @@
 #' @param monthly_harvest_season Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,	hmonth, areamask
 #' @param rollingAvgYears Default = 15
 #' @param growing_season_dir Default = NULL
+#' @param tas_historical = NULL. Filename of historical temperature ncdf.
+#' @param tas_projected = NULL. Filename of projected (hot or cold) temperature ncdf.
+#' @param pr_historical = NULL. Filename of historical precipitation flux ncdf.
+#' @param pr_projected = NULL. Filename of projected (hot or cold) precipitation flux ncdf.
+#' @param historical_start_year = NULL. Start year of historical data.
+#' @param projection_start_year = NULL. Start year of projection data.
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -26,7 +32,7 @@
 
 calculate_deltas_from_climate <- function(climate_dir = NULL,
                                           write_dir = "outputs_calculate_delta_from_climate",
-                                          esm_name = 'CanESM5',
+                                          esm_name = NULL,
                                           crops = c("Corn", "Wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
                                           minlat = -87.8638,
@@ -34,7 +40,13 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
                                           monthly_growing_season = NULL,
                                           monthly_harvest_season = NULL,
                                           rollingAvgYears = 15,
-                                          growing_season_dir = NULL) {
+                                          growing_season_dir = NULL,
+                                          tas_historical = NULL,
+                                          tas_projected = NULL,
+                                          pr_historical = NULL,
+                                          pr_projected = NULL,
+                                          historical_start_year = NULL,
+                                          projection_start_year = NULL) {
 
 
 
@@ -46,6 +58,9 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
   # Check write dir
   if(!dir.exists(write_dir)){dir.create(write_dir)}
+
+  # Make a directory for growing_season_dir if not there
+  if(!dir.exists(growing_season_dir)){dir.create(growing_season_dir)}
 
   # Initialize values
   NULL -> areamask -> basePr -> baseTemp -> crop -> gslength -> hmonth ->
@@ -62,12 +77,12 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
   # function to convert dates
   ##TODO you'll have to adjust this depending on your calendar and units in climate data:
-  # days since 1850-01-01 00:00:00, 365 day year
-  convert_time <- function(time, reference_year, nc_start_year){
+  # months since <start_year>-01-01
+  convert_time <- function(time, start_year){
     time %>%
-      dplyr::mutate(time_index = as.integer(row.names(.)) - 1 + 12*(nc_start_year - reference_year),
+      dplyr::mutate(time_index = as.integer(row.names(.)) - 1,
              month = floor(time_index %% 12) + 1,
-             year = floor(time_index/ 12) + reference_year,
+             year = floor(time_index/ 12) + start_year,
              time_id = paste0(month, '~', year )) %>%
       dplyr::select(time, time_id)
   }
@@ -136,9 +151,14 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     # The names of the files you want to work with:
     # ##TODO you'll probably have different files name structure than the example hadgem data I had
     #        handy. It will probably look more like this commented block for `batch0`
-    batch0 <- c(paste0(climate_dir, "/", varname, "_Amon_CanESM5_historical_r1i1p1f1_orig.nc"),
-                paste0(climate_dir, "/", varname, "_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc"))
 
+    if (varname == "tas") {
+      batch0 <- c(paste0(climate_dir, "/", tas_historical),
+                  paste0(climate_dir, "/", tas_projected))
+    } else if (varname == "pr") {
+      batch0 <- c(paste0(climate_dir, "/", pr_historical),
+                  paste0(climate_dir, "/", pr_projected))
+    }
 
     # load these files in memory
 
@@ -153,8 +173,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     # each row of x is a single grid cell's time series, each column is a time slice across all grids
     x1 <- t(rbind(matrix(aperm(ncdf4::ncvar_get(ncfile1,varname),c(3,1,2)),length(time1),length(lat1)*length(lon1))))
     colnames(x1) <- convert_time(time = data.frame(time=time1),
-                                 reference_year = 1850,
-                                 nc_start_year = 1850)$time_id
+                                 start_year = historical_start_year)$time_id
 
     # The projection file, which starts in 2015 in CMIP6
     ncfile2 <- ncdf4::nc_open(batch0[2])
@@ -167,8 +186,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     # each row of x is a single grid cell's time series, each column is a time slice across all grids
     x2 <- t(rbind(matrix(aperm(ncdf4::ncvar_get(ncfile2,varname),c(3,1,2)),length(time2),length(lat2)*length(lon2))))
     colnames(x2) <- convert_time(time = data.frame(time=time2),
-                                 reference_year = 1850,
-                                 nc_start_year = 2015)$time_id
+                                 start_year = projection_start_year)$time_id
 
 
     # make one data frame with all years
@@ -179,6 +197,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     rlang::inform(paste0("ncdf file 2: ",batch0[2],", var: ", varname, "..."))
 
     x <- cbind(grid, x1, x2) %>%
+      dplyr::select(unique(colnames(.))) %>%
       tidyr::gather(time, value, -lon, -lat) %>%
       tidyr::separate(time, into = c('month', 'year'), sep = '~') %>%
       dplyr::mutate(year = as.integer(year),
@@ -193,14 +212,13 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
         x %>%
           keep_months_and_avg(., crp=crp, irrig=irrig) %>%
-          utils::write.csv(., paste0(write_dir, '/', esm_name, '_', varname,
+          utils::write.csv(., paste0(growing_season_dir, '/', esm_name, '_', varname,
                               '_', crp, '_', irrig,
                               '_growing_season_avg.csv'),
                     row.names = F)
 
       }
     }
-
   }
 
   ###############################################################################
@@ -241,8 +259,8 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       # get the T and P growing season average files loaded for this crop-irr combo:
       filenames <- list.files(growing_season_dir, pattern = esm_name, full.names=TRUE, recursive=FALSE)
       filenames <- filenames[grepl(paste0(crp, '_', irrig), filenames)]
-      tas_file <- filenames[grepl('tas', filenames)]
-      pr_file <- filenames[grepl('pr', filenames)]
+      tas_file <- filenames[grepl('_tas_', filenames)]
+      pr_file <- filenames[grepl('_pr_', filenames)]
 
       tas <- utils::read.csv(tas_file, stringsAsFactors = F)
       pr <- utils::read.csv(pr_file, stringsAsFactors = F)
