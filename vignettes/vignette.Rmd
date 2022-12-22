@@ -160,15 +160,13 @@ The first step in the workflow processes climate data (see table for source) for
 
 ## Table
 
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+--------------------------------------------+
-| File                                                                                                                                                                      | Reference          | Source                                     |
-+===========================================================================================================================================================================+====================+============================================+
-| pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc pr_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc tas_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc | Swart et al., 2019 | <https://doi.org/10.22033/ESGF/CMIP6.3610> |
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+--------------------------------------------+
-| pmonth_gslength_unifWheat_smallareamask.csv                                                                                                                               | Snyder, 2018       | <https://zenodo.org/record/1415487>        |
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+--------------------------------------------+
-| p_h\_months_unifWheat_smallareamask.csv                                                                                                                                   | Snyder, 2018       | <https://zenodo.org/record/1415487>        |
-+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------+--------------------------------------------+
+| File                                                                           | Reference          | Source                                                                             |
+|--------------------------------------------------------------------------------|--------------------|------------------------------------------------------------------------------------|
+| pr_Amon_CanESM5_historical_r1i1p1f1.nc tas_Amon_CanESM5_historical_r1i1p1f1.nc | Swart et al., 2019 | <https://www.wdc-climate.de/ui/cmip6?input=CMIP6.CMIP.CCCma.CanESM5.historical>    |
+| pr_Amon_CanESM5_ssp245_r1i1p1f1.nc tas_Amon_CanESM5_ssp245_r1i1p1f1.nc         | Swart et al., 2019 | <https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp245> |
+| pr_Amon_CanESM5_ssp585_r1i1p1f1.nc tas_Amon_CanESM5_ssp585_r1i1p1f1.nc         | Swart et al., 2019 | <https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp585> |
+| pmonth_gslength_unifWheat_smallareamask.csv                                    | Snyder, 2018       | <https://zenodo.org/record/1415487>                                                |
+| p_h\_months_unifWheat_smallareamask.csv                                        | Snyder, 2018       | <https://zenodo.org/record/1415487>                                                |
 
 ## Example Script
 
