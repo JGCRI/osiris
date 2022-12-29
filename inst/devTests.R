@@ -10,7 +10,7 @@ osiris::get_example_data(
 ) -> data_folder; data_folder;
 
 # Change data folder
-# Run Step 0 below to get the path to the data files
+# Run Step 0 to get the path to the data files
 # data_folder = ADD_PATH_TO_YOUR_OSIRIS_DATA
 
 # Test for wrf_to_osiris
@@ -29,7 +29,7 @@ osiris::calculate_deltas_from_climate(
   write_dir = paste0(data_folder,"/outputs_calculate_delta_from_climate"),
   monthly_growing_season = paste0(data_folder,"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"),
   monthly_harvest_season = paste0(data_folder,"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"),
-  growing_season_dir = paste0(data_folder,"/growing_season_climate_data"),
+  growing_season_dir = paste0(data_folder,"/outputs_growing_season_climate_data"),
   esm_name = "CanESM5",
   crops = c("Corn", "Wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
