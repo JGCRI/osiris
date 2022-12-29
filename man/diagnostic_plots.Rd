@@ -43,7 +43,7 @@ for the different climate projections, for the specified crops and irrigation.
 \examples{
 \dontrun{
 library(osiris)
-osiris::wrf_to_osiris()
+osiris::diagnostic_plots()
 }
 }
 \keyword{test}
