@@ -1,9 +1,17 @@
 # Testing scripts
 library(osiris); library(dplyr);library(tibble);library(ncdf4);library(rlang); library(data.table)
 
+# Test for Step 0: get_example_data
+# You may define your own write_dir and dir_name.
+osiris::get_example_data(
+  write_dir = getwd(),
+  dir_name = "Osiris_Data_Test",
+  data_link = "https://zenodo.org/record/7490786/files/Osiris_Data_Test.zip?download=1"
+) -> data_folder; data_folder;
+
 # Change data folder
 # Run Step 0 below to get the path to the data files
-data_folder = ADD_PATH_TO_YOUR_OSIRIS_DATA
+# data_folder = ADD_PATH_TO_YOUR_OSIRIS_DATA
 
 # Test for wrf_to_osiris
 osiris::wrf_to_osiris(
@@ -12,15 +20,6 @@ osiris::wrf_to_osiris(
   osiris_ncdf = paste0(data_folder,"/climate_data/tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc"),
   time_step = "3 hours",
   scenario = "historical"
-)
-
-
-# Test for Step 0: get_example_data
-# You may define your own write_dir and dir_name.
-osiris::get_example_data(
-  write_dir = getwd(),
-  dir_name = "Osiris_Data_Test",
-  data_link = "https://zenodo.org/record/7490786/files/Osiris_Data_Test.zip?download=1"
 )
 
 
