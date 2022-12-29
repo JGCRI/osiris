@@ -3,6 +3,7 @@
 #' Function to download the data files from zenodo that are needed to run Osiris.
 #'
 #' @param write_dir Default = getwd()
+#' @param dir_name = "Osiris_Data". Name of directory to install zip file to.
 #' @param data_link Default = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"
 #' @keywords test
 #' @return number
@@ -16,6 +17,7 @@
 #' }
 
 get_example_data <- function(write_dir = getwd(),
+                             dir_name = "Osiris_Data",
                              data_link = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1") {
 
 
@@ -25,17 +27,17 @@ get_example_data <- function(write_dir = getwd(),
 
   rlang::inform("Starting get_example_data")
 
-  # Download Osiris_Data.zip
+  # Download zip file from zenodo
   utils::download.file(url = data_link,
-                       destfile = paste0(write_dir, "/Osiris_Data.zip"),
+                       destfile = paste0(write_dir, "/", dir_name, ".zip"),
                        mode = "wb")
 
-  utils::unzip(paste0(write_dir, "/Osiris_Data.zip"),
-               exdir = "Osiris_Data")
+  utils::unzip(paste0(write_dir, "/", dir_name, ".zip"),
+               exdir = paste0(write_dir, "/", dir_name))
 
-  unlink(paste0(write_dir, "/Osiris_Data.zip"))
+  unlink(paste0(write_dir, "/", dir_name, ".zip"))
 
-  rlang::inform(paste0("You can set data_folder = \"", write_dir, "/Osiris_Data\" to run the example scripts from https://jgcri.github.io/osiris/articles/vignette.html"))
+  rlang::inform(paste0("You can set data_folder = \"", write_dir, "/", dir_name, "\" to run the example scripts from https://jgcri.github.io/osiris/articles/vignette.html"))
 
 
   #.........................

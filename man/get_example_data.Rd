@@ -6,11 +6,14 @@
 \usage{
 get_example_data(
   write_dir = getwd(),
+  dir_name = "Osiris_Data",
   data_link = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"
 )
 }
 \arguments{
 \item{write_dir}{Default = getwd()}
+
+\item{dir_name}{= "Osiris_Data". Name of directory to install zip file to.}
 
 \item{data_link}{Default = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"}
 }
