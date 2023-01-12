@@ -170,7 +170,7 @@ test_that("create_AgProdChange_xml produces expected files file contents", {
     file_i = unlist(list.files(paste0(data_folder,"/outputs_create_AgProdChange_xml")))[i]
 
     testthat::expect_identical(
-      xmlParse(paste0(data_folder,"/outputs_create_AgProdChange_xml/",file_i)),
+      read.csv(paste0(data_folder,"/outputs_create_AgProdChange_xml/",file_i)),
       read.csv(paste0(data_folder,"/outputs_create_AgProdChange_xml_test/",file_i)),
       label = paste0("Error in file: ", file_i))
 
