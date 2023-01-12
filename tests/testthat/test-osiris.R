@@ -1,5 +1,5 @@
 context("osiris Tests")
-library(osiris); library(testthat); library(dplyr)
+library(osiris); library(testthat); library(dplyr);
 
 # Run tests with test data
 # Test for Step 0: get_example_data
@@ -36,12 +36,26 @@ osiris::calculate_deltas_from_climate(
 test_that("calculate_deltas_from_climate produces expected files", {
 
   testthat::expect_identical( unlist(list.files(paste0(data_folder,"/outputs_calculate_delta_from_climate"))),
-                              c("CanESM5_corn_irr_smooth_deltaT_deltaP.csv","CanESM5_corn_rfd_smooth_deltaT_deltaP.csv",
-                             "CanESM5_rice_irr_smooth_deltaT_deltaP.csv","CanESM5_rice_rfd_smooth_deltaT_deltaP.csv",
-                             "CanESM5_soy_irr_smooth_deltaT_deltaP.csv","CanESM5_soy_rfd_smooth_deltaT_deltaP.csv",
-                             "CanESM5_wheat_irr_smooth_deltaT_deltaP.csv","CanESM5_wheat_rfd_smooth_deltaT_deltaP.csv"))
+                              unlist(list.files(paste0(data_folder,"/outputs_calculate_delta_from_climate_test"))))
 
 })
+
+
+test_that("calculate_deltas_from_climate produces expected file contents", {
+
+  for (i in 1:length(unlist(list.files(paste0(data_folder,"/outputs_calculate_delta_from_climate"))))){
+
+    file_i = unlist(list.files(paste0(data_folder,"/outputs_calculate_delta_from_climate")))[i]
+
+    testthat::expect_identical(
+      read.csv(paste0(data_folder,"/outputs_calculate_delta_from_climate/",file_i)),
+      read.csv(paste0(data_folder,"/outputs_calculate_delta_from_climate_test/",file_i)),
+      label = paste0("Error in file: ", file_i))
+
+    }
+
+})
+
 
 # Step 2 - grid_to_basin_yield
 osiris::grid_to_basin_yield(
@@ -64,10 +78,22 @@ osiris::grid_to_basin_yield(
 test_that("grid_to_basin_yield produces expected files", {
 
   testthat::expect_identical( unlist(list.files(paste0(data_folder,"/outputs_grid_to_basin_yield"))),
-                              c("LPJmL_CanESM5_ssp245_maize_2010_2020.csv",
-                                "LPJmL_CanESM5_ssp245_rice_2010_2020.csv",
-                                "LPJmL_CanESM5_ssp245_soy_2010_2020.csv",
-                                "LPJmL_CanESM5_ssp245_wheat_2010_2020.csv"))
+                              unlist(list.files(paste0(data_folder,"/outputs_grid_to_basin_yield_test"))))
+
+})
+
+test_that("grid_to_basin_yield produces expected file contents", {
+
+  for (i in 1:length(unlist(list.files(paste0(data_folder,"/outputs_grid_to_basin_yield"))))){
+
+    file_i = unlist(list.files(paste0(data_folder,"/outputs_grid_to_basin_yield")))[i]
+
+    testthat::expect_identical(
+      read.csv(paste0(data_folder,"/outputs_grid_to_basin_yield/",file_i)),
+      read.csv(paste0(data_folder,"/outputs_grid_to_basin_yield_test/",file_i)),
+      label = paste0("Error in file: ", file_i))
+
+  }
 
 })
 
@@ -94,8 +120,22 @@ osiris::yield_to_gcam_basin(
 test_that("yield_to_gcam_basin produces expected files", {
 
   testthat::expect_identical( unlist(list.files(paste0(data_folder,"/outputs_yield_to_gcam_basin"))),
-                              c("ag_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv",
-                                "bio_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv"))
+                              unlist(list.files(paste0(data_folder,"/outputs_yield_to_gcam_basin_test"))))
+
+})
+
+test_that("yield_to_gcam_basin produces expected file contents", {
+
+  for (i in 1:length(unlist(list.files(paste0(data_folder,"/outputs_yield_to_gcam_basin"))))){
+
+    file_i = unlist(list.files(paste0(data_folder,"/outputs_yield_to_gcam_basin")))[i]
+
+    testthat::expect_identical(
+      read.csv(paste0(data_folder,"/outputs_yield_to_gcam_basin/",file_i)),
+      read.csv(paste0(data_folder,"/outputs_yield_to_gcam_basin_test/",file_i)),
+      label = paste0("Error in file: ", file_i))
+
+  }
 
 })
 
@@ -119,10 +159,22 @@ osiris::create_AgProdChange_xml(
 test_that("create_AgProdChange_xml produces expected files", {
 
   testthat::expect_identical( unlist(list.files(paste0(data_folder,"/outputs_create_AgProdChange_xml"))),
-                              c("ag_prodchange_ssp245_ssp5_CanESM5_LPJmL.csv",
-                                "ag_prodchange_ssp245_ssp5_CanESM5_LPJmL.xml",
-                                "ag_prodchange_ssp245_ssp5_CanESM5_NA.csv",
-                                "ag_prodchange_ssp245_ssp5_CanESM5_NA.xml"))
+                              unlist(list.files(paste0(data_folder,"/outputs_create_AgProdChange_xml_test"))))
+
+})
+
+test_that("create_AgProdChange_xml produces expected files file contents", {
+
+  for (i in 1:length(unlist(list.files(paste0(data_folder,"/outputs_create_AgProdChange_xml"))))){
+
+    file_i = unlist(list.files(paste0(data_folder,"/outputs_create_AgProdChange_xml")))[i]
+
+    testthat::expect_identical(
+      xmlParse(paste0(data_folder,"/outputs_create_AgProdChange_xml/",file_i)),
+      read.csv(paste0(data_folder,"/outputs_create_AgProdChange_xml_test/",file_i)),
+      label = paste0("Error in file: ", file_i))
+
+  }
 
 })
 
