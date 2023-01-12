@@ -6,7 +6,7 @@ library(osiris); library(dplyr);library(tibble);library(ncdf4);library(rlang); l
 osiris::get_example_data(
   write_dir = getwd(),
   dir_name = "Osiris_Data_Test",
-  data_link = "https://zenodo.org/record/7490786/files/Osiris_Data_Test.zip?download=1"
+  data_link = "https://zenodo.org/record/7530067/files/Osiris_Data_Test.zip?download=1"
 ) -> data_folder; data_folder;
 
 # Change data folder
