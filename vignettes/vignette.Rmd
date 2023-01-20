@@ -125,6 +125,15 @@ Additional steps for UBUNTU from a terminal
 Additional steps for MACOSX from a terminal
 
     brew install pkg-config
+    
+### Download supplement
+To run the Osiris package, download the supplementary data which includes the climate data files, mapping files, crop emulator files, etc. Note that the `climate_data` folder currently contains temperature and precipitation files specifically from the CanESM5 model. The Osiris package was originally designed to function with the CanESM5 data. If a different set of climate data are used, it may need to be regridded to conform to the same format as CanESM5. Feel free to start an issue on the GitHub page or contact the author (Hamza) for help needed to integrate your climate data into Osiris.
+
+``` r
+library(osiris)
+get_example_data()
+```
+The `get_example_data()` function takes in two arguments, `write_dir` (default is the current directory) and `data_link` (default is the zenodo link to the Osiris data). 
 
 <!-------------------------->
 

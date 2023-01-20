@@ -20,7 +20,7 @@
 #' @examples
 #' \dontrun{
 #' library(osiris)
-#' osiris::wrf_to_osiris()
+#' osiris::diagnostic_plots()
 #' }
 
 diagnostic_plots <- function(hot_ssp3_apc = NULL,

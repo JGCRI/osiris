@@ -7,7 +7,7 @@ on:
 
 
 jobs:
-  pkgdown:
+  docs:
     runs-on: ubuntu-latest
     
     env:
