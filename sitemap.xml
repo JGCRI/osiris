@@ -37,6 +37,12 @@
     <loc>/reference/create_AgProdChange_xml.html</loc>
   </url>
   <url>
+    <loc>/reference/diagnostic_plots.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_example_data.html</loc>
+  </url>
+  <url>
     <loc>/reference/grid_to_basin_yield.html</loc>
   </url>
   <url>
@@ -44,6 +50,9 @@
   </url>
   <url>
     <loc>/reference/osiris.html</loc>
+  </url>
+  <url>
+    <loc>/reference/wrf_to_osiris.html</loc>
   </url>
   <url>
     <loc>/reference/yield_to_gcam_basin.html</loc>

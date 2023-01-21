@@ -93,66 +93,95 @@ gcam basin level via MIRCA harvested areas.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">grid_to_basin_yield</span><span class="op">(</span>
-  carbon <span class="op">=</span> <span class="cn">NULL</span>,
-  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,
-  emulator_dir <span class="op">=</span> <span class="cn">NULL</span>,
-  input_dir <span class="op">=</span> <span class="cn">NULL</span>,
-  area_dir <span class="op">=</span> <span class="cn">NULL</span>,
-  basin_grid <span class="op">=</span> <span class="cn">NULL</span>,
-  basin_id <span class="op">=</span> <span class="cn">NULL</span>,
-  write_dir <span class="op">=</span> <span class="st">"outputs_grid_to_basin_yield"</span>,
-  wheat_area <span class="op">=</span> <span class="cn">NULL</span>,
-  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,
-  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,
-  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,
-  scn_name <span class="op">=</span> <span class="st">"rcp8p5"</span>,
-  N <span class="op">=</span> <span class="fl">200</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">grid_to_basin_yield</span><span class="op">(</span></span>
+<span>  carbon <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emulator_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  input_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  area_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  basin_grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  basin_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  write_dir <span class="op">=</span> <span class="st">"outputs_grid_to_basin_yield"</span>,</span>
+<span>  wheat_area <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="st">"WRF"</span>,</span>
+<span>  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5_hot"</span>,</span>
+<span>  N <span class="op">=</span> <span class="fl">200</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>carbon</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>weight_floor_ha</dt>
 <dd><p>Default = 1</p></dd>
+
+
 <dt>emulator_dir</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>input_dir</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>area_dir</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>basin_grid</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>basin_id</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>write_dir</dt>
 <dd><p>Default = "outputs_grid_to_basin_yield". Output Folder</p></dd>
+
+
 <dt>wheat_area</dt>
 <dd><p>Default = NULL Spring and winter wheat areas</p></dd>
+
+
 <dt>crops</dt>
 <dd><p>Default = c("maize", "rice", "soy", "wheat")</p></dd>
+
+
 <dt>esm_name</dt>
-<dd><p>Default = 'CanESM5'</p></dd>
+<dd><p>Default = 'WRF'</p></dd>
+
+
 <dt>cm_name</dt>
 <dd><p>Default = 'LPJmL'</p></dd>
+
+
 <dt>scn_name</dt>
-<dd><p>Default = 'rcp8p5'</p></dd>
+<dd><p>Default = 'rcp8p5_hot'</p></dd>
+
+
 <dt>N</dt>
 <dd><p>Default = 200. Assuming nothing is nitrogen limited and apply across grids</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>number</p>
+    
+
+<p>number</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">osiris</span><span class="fu">::</span><span class="fu">grid_to_basin_yield</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">osiris</span><span class="fu">::</span><span class="fu">grid_to_basin_yield</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -167,7 +196,7 @@ gcam basin level via MIRCA harvested areas.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

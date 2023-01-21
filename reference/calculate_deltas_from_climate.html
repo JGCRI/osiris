@@ -91,57 +91,110 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">calculate_deltas_from_climate</span><span class="op">(</span>
-  climate_dir <span class="op">=</span> <span class="cn">NULL</span>,
-  write_dir <span class="op">=</span> <span class="st">"outputs_calculate_delta_from_climate"</span>,
-  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,
-  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,
-  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,
-  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,
-  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,
-  monthly_growing_season <span class="op">=</span> <span class="cn">NULL</span>,
-  monthly_harvest_season <span class="op">=</span> <span class="cn">NULL</span>,
-  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>,
-  growing_season_dir <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculate_deltas_from_climate</span><span class="op">(</span></span>
+<span>  climate_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  write_dir <span class="op">=</span> <span class="st">"outputs_calculate_delta_from_climate"</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,</span>
+<span>  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,</span>
+<span>  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,</span>
+<span>  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,</span>
+<span>  monthly_growing_season <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  monthly_harvest_season <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  growing_season_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tas_historical <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  tas_projected <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pr_historical <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pr_projected <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  historical_start_year <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  projection_start_year <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>climate_dir</dt>
 <dd><p>Default = NULL</p></dd>
+
+
 <dt>write_dir</dt>
 <dd><p>Default = "outputs_calculate_delta_from_climate". Output Folder</p></dd>
+
+
 <dt>esm_name</dt>
-<dd><p>Default = 'CanESM5'</p></dd>
+<dd><p>Default = NULL</p></dd>
+
+
 <dt>crops</dt>
 <dd><p>Default = c("Corn", "Wheat", "Rice", "Soy")</p></dd>
+
+
 <dt>irrigation_rainfed</dt>
 <dd><p>Default = c("IRR", "RFD")</p></dd>
+
+
 <dt>minlat</dt>
 <dd><p>Default = -87.8638</p></dd>
+
+
 <dt>minlon</dt>
 <dd><p>Default = -179.75</p></dd>
+
+
 <dt>monthly_growing_season</dt>
 <dd><p>Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    gslength, areamask</p></dd>
+
+
 <dt>monthly_harvest_season</dt>
 <dd><p>Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask</p></dd>
+
+
 <dt>rollingAvgYears</dt>
 <dd><p>Default = 15</p></dd>
+
+
 <dt>growing_season_dir</dt>
 <dd><p>Default = NULL</p></dd>
+
+
+<dt>tas_historical</dt>
+<dd><p>= NULL. Filename of historical temperature ncdf.</p></dd>
+
+
+<dt>tas_projected</dt>
+<dd><p>= NULL. Filename of projected (hot or cold) temperature ncdf.</p></dd>
+
+
+<dt>pr_historical</dt>
+<dd><p>= NULL. Filename of historical precipitation flux ncdf.</p></dd>
+
+
+<dt>pr_projected</dt>
+<dd><p>= NULL. Filename of projected (hot or cold) precipitation flux ncdf.</p></dd>
+
+
+<dt>historical_start_year</dt>
+<dd><p>= NULL. Start year of historical data.</p></dd>
+
+
+<dt>projection_start_year</dt>
+<dd><p>= NULL. Start year of projection data.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>number</p>
+    
+
+<p>number</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">osiris</span><span class="fu">::</span><span class="fu">calculate_deltas_from_climate</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">osiris</span><span class="fu">::</span><span class="fu">calculate_deltas_from_climate</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -156,7 +209,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

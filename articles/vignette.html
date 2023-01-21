@@ -101,7 +101,7 @@
 
       
 
-      </header><script src="vignette_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>User Guide</h1>
@@ -147,24 +147,42 @@
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
-<p>Osiris is an R package that is used to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). This package is a modular data pipeline that consists of four steps that take gridded crop yield data from existing emulators and transforms them into agricultural yield impacts for GCAM commodities. The four functions are run in series as follows, with a detailed workflow below:</p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
+<p>Osiris is an R package that is used to process climate impacts on
+agricultural yields for the Global Change Analysis Model (GCAM). This
+package is a modular data pipeline that consists of four steps that take
+gridded crop yield data from existing emulators and transforms them into
+agricultural yield impacts for GCAM commodities. The four functions are
+run in series as follows, with a detailed workflow below:</p>
 <ul>
-<li>calculate_deltas_from_climate(): obtain precipitation and temperature data for each crop and irrigation type, as well as the difference relative to baseline average</li>
-<li>grid_to_basin_yield(): use global gridded crop model emulator output to generate crop yield and aggregate to GCAM basins</li>
-<li>yield_to_gcam_basin(): convert agricultural yield data to multipliers for each GCAM commodity-irrigation-basin</li>
-<li>create_AgProdChange_xml(): apply multipliers to AgProdChange from GCAM reference and obtain a new file in xml format</li>
+<li>calculate_deltas_from_climate(): obtain precipitation and
+temperature data for each crop and irrigation type, as well as the
+difference relative to baseline average</li>
+<li>grid_to_basin_yield(): use global gridded crop model emulator output
+to generate crop yield and aggregate to GCAM basins</li>
+<li>yield_to_gcam_basin(): convert agricultural yield data to
+multipliers for each GCAM commodity-irrigation-basin</li>
+<li>create_AgProdChange_xml(): apply multipliers to AgProdChange from
+GCAM reference and obtain a new file in xml format</li>
 </ul>
 <p align="center" style="font-size:18px;">
-<em>Workflow Summary</em>
 </p>
+<p><em>Workflow Summary</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_summary.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_summary.jpg"></p>
+
 <p align="center" style="font-size:18px;">
-<em>Workflow Details</em>
 </p>
+<p><em>Workflow Details</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_detail.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_detail.jpg"></p>
+
 <!-------------------------->
 <!-------------------------->
 </div>
@@ -174,7 +192,9 @@
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
 <ol style="list-style-type: decimal">
 <li>Download and install:
 <ul>
@@ -185,16 +205,36 @@
 <li>In R or R studio:</li>
 </ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/osiris"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"JGCRI/osiris"</span><span class="op">)</span></span></code></pre></div>
 <p>Additional steps for UBUNTU from a terminal</p>
 <pre><code>sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
 sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-dev libavfilter-dev  libmagick++-dev</code></pre>
 <p>Additional steps for MACOSX from a terminal</p>
 <pre><code>brew install pkg-config</code></pre>
+<div class="section level4">
+<h4 id="download-supplement">Download supplement<a class="anchor" aria-label="anchor" href="#download-supplement"></a>
+</h4>
+<p>To run the Osiris package, download the supplementary data which
+includes the climate data files, mapping files, crop emulator files,
+etc. Note that the <code>climate_data</code> folder currently contains
+temperature and precipitation files specifically from the CanESM5 model.
+The Osiris package was originally designed to function with the CanESM5
+data. If a different set of climate data are used, it may need to be
+regridded to conform to the same format as CanESM5. Feel free to start
+an issue on the GitHub page or contact the author (Hamza) for help
+needed to integrate your climate data into Osiris.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/get_example_data.html">get_example_data</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The <code><a href="../reference/get_example_data.html">get_example_data()</a></code> function takes in two arguments,
+<code>write_dir</code> (default is the current directory) and
+<code>data_link</code> (default is the zenodo link to the Osiris
+data).</p>
 <!-------------------------->
 <!-------------------------->
+</div>
 </div>
 <div class="section level2">
 <h2 id="step-1">Step 1<a class="anchor" aria-label="anchor" href="#step-1"></a>
@@ -202,57 +242,100 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
-<p>The first step in the workflow processes climate data (see table for source) for each crop and irrigation type. The growing season-average precipitation and temperature data is calculated and smoothed to obtain the long term growing season average values. Then the change relative to 1980-2010 is calculated to obtain changes in long term growing season average values relative to baseline. A detailed workflow is shown below. The function can be tested using the example script.</p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
+<p>The first step in the workflow processes climate data (see table for
+source) for each crop and irrigation type. The growing season-average
+precipitation and temperature data is calculated and smoothed to obtain
+the long term growing season average values. Then the change relative to
+1980-2010 is calculated to obtain changes in long term growing season
+average values relative to baseline. A detailed workflow is shown below.
+The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h3>
 <p align="center" style="font-size:18px;">
-<em>Step 1 Workflow</em>
 </p>
+<p><em>Step 1 Workflow</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_detail_step1.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_detail_step1.jpg"></p>
+
 </div>
 <div class="section level3">
 <h3 id="table">Table<a class="anchor" aria-label="anchor" href="#table"></a>
 </h3>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="73%">
-<col width="8%">
-<col width="18%">
+<col width="43%">
+<col width="10%">
+<col width="45%">
 </colgroup>
 <thead><tr class="header">
 <th>File</th>
 <th>Reference</th>
 <th>Source</th>
 </tr></thead>
-<tbody><tr class="odd">
-<td>pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc pr_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc tas_Amon_CanESM5_ssp245_r1i1p1f1_orig.nc</td>
+<tbody>
+<tr class="odd">
+<td>pr_Amon_CanESM5_historical_r1i1p1f1.nc
+tas_Amon_CanESM5_historical_r1i1p1f1.nc</td>
 <td>Swart et al., 2019</td>
-<td><a href="https://doi.org/10.22033/ESGF/CMIP6.3610" class="external-link uri">https://doi.org/10.22033/ESGF/CMIP6.3610</a></td>
-</tr></tbody>
+<td><a href="https://www.wdc-climate.de/ui/cmip6?input=CMIP6.CMIP.CCCma.CanESM5.historical" class="external-link uri">https://www.wdc-climate.de/ui/cmip6?input=CMIP6.CMIP.CCCma.CanESM5.historical</a></td>
+</tr>
+<tr class="even">
+<td>pr_Amon_CanESM5_ssp245_r1i1p1f1.nc
+tas_Amon_CanESM5_ssp245_r1i1p1f1.nc</td>
+<td>Swart et al., 2019</td>
+<td><a href="https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp245" class="external-link uri">https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp245</a></td>
+</tr>
+<tr class="odd">
+<td>pr_Amon_CanESM5_ssp585_r1i1p1f1.nc
+tas_Amon_CanESM5_ssp585_r1i1p1f1.nc</td>
+<td>Swart et al., 2019</td>
+<td><a href="https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp585" class="external-link uri">https://www.wdc-climate.de/ui/cmip6?input=CMIP6.ScenarioMIP.CCCma.CanESM5.ssp585</a></td>
+</tr>
+<tr class="even">
+<td>pmonth_gslength_unifWheat_smallareamask.csv</td>
+<td>Snyder, 2018</td>
+<td><a href="https://zenodo.org/record/1415487" class="external-link uri">https://zenodo.org/record/1415487</a></td>
+</tr>
+<tr class="odd">
+<td>p_h_months_unifWheat_smallareamask.csv</td>
+<td>Snyder, 2018</td>
+<td><a href="https://zenodo.org/record/1415487" class="external-link uri">https://zenodo.org/record/1415487</a></td>
+</tr>
+</tbody>
 </table>
 </div>
 <div class="section level3">
 <h3 id="example-script">Example Script<a class="anchor" aria-label="anchor" href="#example-script"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
-<span class="co"># Step 1: calculate_deltas_from_climate</span>
-<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_deltas_from_climate.html">calculate_deltas_from_climate</a></span><span class="op">(</span>
-  climate_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/climate_data"</span><span class="op">)</span>,
-  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,
-  monthly_growing_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"</span><span class="op">)</span>,
-  monthly_harvest_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"</span><span class="op">)</span>,
-  growing_season_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_season_climate_data"</span><span class="op">)</span>,
-  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,
-  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,
-  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,
-  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,
-  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,
-  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>
-<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
+<span><span class="co"># Step 1: calculate_deltas_from_climate</span></span>
+<span><span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/calculate_deltas_from_climate.html">calculate_deltas_from_climate</a></span><span class="op">(</span></span>
+<span>  climate_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/climate_data"</span><span class="op">)</span>,</span>
+<span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,</span>
+<span>  monthly_growing_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"</span><span class="op">)</span>,</span>
+<span>  monthly_harvest_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"</span><span class="op">)</span>,</span>
+<span>  growing_season_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_season_climate_data"</span><span class="op">)</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,</span>
+<span>  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,</span>
+<span>  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,</span>
+<span>  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,</span>
+<span>  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  tas_historical <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc"</span>,</span>
+<span>  tas_projected <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc"</span>,</span>
+<span>  pr_historical <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc"</span>,</span>
+<span>  pr_projected <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc"</span>,</span>
+<span>  historical_start_year <span class="op">=</span> <span class="fl">1850</span>,</span>
+<span>  projection_start_year <span class="op">=</span> <span class="fl">2015</span></span>
+<span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
 <!-------------------------->
 </div>
@@ -263,25 +346,38 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
-<p>The second step in the workflow uses the output from a global gridded crop model emulator to generate crop yield that is aggregated to GCAM basins. The winter and spring wheat area file (see table) is used to unify the emulator data for spring and winter wheat into a single grid. The crop yield is calculated using a polynomial equation (Franke et al., 2020) based on the precipitation and temperature data obtained from Step 1. The yields are then aggregated to GCAM basins using MIRCA2000 harvested area. A detailed workflow is shown below. The function can be tested using the example script.</p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
+<p>The second step in the workflow uses the output from a global gridded
+crop model emulator to generate crop yield that is aggregated to GCAM
+basins. The winter and spring wheat area file (see table) is used to
+unify the emulator data for spring and winter wheat into a single grid.
+The crop yield is calculated using a polynomial equation (Franke et al.,
+2020) based on the precipitation and temperature data obtained from Step
+1. The yields are then aggregated to GCAM basins using MIRCA2000
+harvested area. A detailed workflow is shown below. The function can be
+tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-1">Workflow<a class="anchor" aria-label="anchor" href="#workflow-1"></a>
 </h3>
 <p align="center" style="font-size:18px;">
-<em>Step 2 Workflow</em>
 </p>
+<p><em>Step 2 Workflow</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_detail_step2.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_detail_step2.jpg"></p>
+
 </div>
 <div class="section level3">
 <h3 id="table-1">Table<a class="anchor" aria-label="anchor" href="#table-1"></a>
 </h3>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="61%">
+<col width="59%">
 <col width="6%">
-<col width="32%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
 <th>File</th>
@@ -290,20 +386,44 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>LPJmL_maize_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_rice_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_soy_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_spring_wheat_ggcmi_phase2_emulator_A0.nc4<br>LPJmL_winter_wheat_ggcmi_phase2_emulator_A0.nc4</td>
+<td>magicc_rcp8p5_co2.csv</td>
+<td>Snyder, 2018</td>
+<td><a href="https://zenodo.org/record/1415487" class="external-link uri">https://zenodo.org/record/1415487</a></td>
+</tr>
+<tr class="even">
+<td>LPJmL_maize_ggcmi_phase2_emulator_A0.nc4
+LPJmL_rice_ggcmi_phase2_emulator_A0.nc4
+LPJmL_soy_ggcmi_phase2_emulator_A0.nc4
+LPJmL_spring_wheat_ggcmi_phase2_emulator_A0.nc4
+LPJmL_winter_wheat_ggcmi_phase2_emulator_A0.nc4</td>
 <td>Franke, 2019</td>
 <td><a href="https://doi.org/10.5281/zenodo.3592453" class="external-link uri">https://doi.org/10.5281/zenodo.3592453</a></td>
 </tr>
+<tr class="odd">
+<td>
+<p>annual_area_harvested_irc_crop01_ha_30mn.asc</p>
+<p>⋮</p>
+<p>annual_area_harvested_irc_crop26_ha_30mn.asc
+annual_area_harvested_rfc_crop01_ha_30mn.asc</p>
+<p>⋮</p>
+<p>annual_area_harvested_rfc_crop26_ha_30mn.asc</p>
+</td>
+<td>Portmann et al., 2010</td>
+<td>
+<a href="https://doi.org/10.1029/2008GB003435" class="external-link uri">https://doi.org/10.1029/2008GB003435</a> (data: <a href="https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000" class="external-link uri">https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000</a>)</td>
+</tr>
 <tr class="even">
+<td>
+<p>gridData.csv</p>
+<p>gcam_basin_ids.csv</p>
+</td>
+<td></td>
+<td>GCAM</td>
+</tr>
+<tr class="odd">
 <td>winter_and_spring_wheat_areas_v1_180627.nc4</td>
 <td>Müller, 2020</td>
 <td><a href="https://doi.org/10.5281/zenodo.3773827" class="external-link uri">https://doi.org/10.5281/zenodo.3773827</a></td>
-</tr>
-<tr class="odd">
-<td>annual_area_harvested_irc_crop01_ha_30mn.asc<br>⋮<br>annual_area_harvested_irc_crop26_ha_30mn.asc<br>annual_area_harvested_rfc_crop01_ha_30mn.asc<br>⋮<br>annual_area_harvested_rfc_crop26_ha_30mn.asc</td>
-<td>Portmann et al., 2010</td>
-<td>
-<a href="https://doi.org/10.1029/2008GB003435" class="external-link uri">https://doi.org/10.1029/2008GB003435</a><br>(data: <a href="https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000" class="external-link uri">https://www.uni-frankfurt.de/45218031/Data_download_center_for_MIRCA2000</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -311,25 +431,25 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <div class="section level3">
 <h3 id="example-script-1">Example Script<a class="anchor" aria-label="anchor" href="#example-script-1"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
-<span class="co"># Step 2: grid_to_basin_yield</span>
-<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/grid_to_basin_yield.html">grid_to_basin_yield</a></span><span class="op">(</span>
-  carbon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_inputs/magicc_rcp8p5_co2.csv"</span><span class="op">)</span>,
-  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,
-  emulator_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_fcns/ggcmi_phase2"</span><span class="op">)</span>,
-  input_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,
-  area_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/area_data"</span><span class="op">)</span>,
-  basin_grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gridData.csv"</span><span class="op">)</span>,
-  basin_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,
-  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,
-  wheat_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/winter_and_spring_wheat_areas_v1_180627.nc4"</span><span class="op">)</span>,
-  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,
-  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,
-  cm_name <span class="op">=</span> <span class="st">'LPJmL'</span>,
-  scn_name <span class="op">=</span> <span class="st">'rcp8p5'</span>,
-  N <span class="op">=</span> <span class="fl">200</span>
-<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
+<span><span class="co"># Step 2: grid_to_basin_yield</span></span>
+<span><span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/grid_to_basin_yield.html">grid_to_basin_yield</a></span><span class="op">(</span></span>
+<span>  carbon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_inputs/magicc_rcp8p5_co2.csv"</span><span class="op">)</span>,</span>
+<span>  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  emulator_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/yield_response_fcns/ggcmi_phase2"</span><span class="op">)</span>,</span>
+<span>  input_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,</span>
+<span>  area_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/area_data"</span><span class="op">)</span>,</span>
+<span>  basin_grid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gridData.csv"</span><span class="op">)</span>,</span>
+<span>  basin_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,</span>
+<span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,</span>
+<span>  wheat_area <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/winter_and_spring_wheat_areas_v1_180627.nc4"</span><span class="op">)</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
+<span>  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5"</span>,</span>
+<span>  N <span class="op">=</span> <span class="fl">200</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
 <!-------------------------->
 </div>
@@ -340,42 +460,79 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
-<p>The third step in the workflow converts the agricultural yield data from the second step to crop-irrigation-basin multipliers, which are then converted to multipliers for each GCAM commodity-irrigation-basin based on GTAP harvested area weights. A detailed workflow is shown below. The function can be tested using the example script.</p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
+<p>The third step in the workflow converts the agricultural yield data
+from the second step to crop-irrigation-basin multipliers, which are
+then converted to multipliers for each GCAM commodity-irrigation-basin
+based on GTAP harvested area weights. A detailed workflow is shown
+below. The function can be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-2">Workflow<a class="anchor" aria-label="anchor" href="#workflow-2"></a>
 </h3>
 <p align="center" style="font-size:18px;">
-<em>Step 3 Workflow</em>
 </p>
+<p><em>Step 3 Workflow</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_detail_step3.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_detail_step3.jpg"></p>
+
 </div>
 <div class="section level3">
 <h3 id="table-2">Table<a class="anchor" aria-label="anchor" href="#table-2"></a>
 </h3>
+<table style="width:99%;" class="table">
+<colgroup>
+<col width="61%">
+<col width="10%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Reference</th>
+<th>Source</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>iso_GCAM_regID.csv</td>
+<td>Snyder, 2018</td>
+<td><a href="https://zenodo.org/record/1415487" class="external-link uri">https://zenodo.org/record/1415487</a></td>
+</tr>
+<tr class="even">
+<td>gcam_basin_ids.csv FAO_ag_items_PRODSTAT_expanded_corrected.csv
+L100.LDS_ag_HA_ha.csv</td>
+<td></td>
+<td>GCAM</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="example-script-2">Example Script<a class="anchor" aria-label="anchor" href="#example-script-2"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
-<span class="co"># Step 3: yield_to_gcam_basin</span>
-<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/yield_to_gcam_basin.html">yield_to_gcam_basin</a></span><span class="op">(</span>
-  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin"</span><span class="op">)</span>,
-  emulated_basin_yield_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,
-  iso_GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/iso_GCAM_regID.csv"</span><span class="op">)</span>,
-  FAO_ag_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/FAO_ag_items_PRODSTAT_expanded_corrected.csv"</span><span class="op">)</span>,
-  iso_harvest_area_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/L100.LDS_ag_HA_ha.csv"</span><span class="op">)</span>,
-  iso_GCAM_basin_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,
-  max_CCImult <span class="op">=</span> <span class="fl">2.5</span>,
-  min_CCImult <span class="op">=</span> <span class="fl">0.01</span>,
-  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,
-  rolling_avg_years <span class="op">=</span> <span class="fl">15</span>,
-  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,
-  minFutYear <span class="op">=</span> <span class="fl">2015</span>,
-  maxFutYear <span class="op">=</span> <span class="fl">2100</span>
-<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
+<span><span class="co"># Step 3: yield_to_gcam_basin</span></span>
+<span><span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/yield_to_gcam_basin.html">yield_to_gcam_basin</a></span><span class="op">(</span></span>
+<span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin"</span><span class="op">)</span>,</span>
+<span>  emulated_basin_yield_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,</span>
+<span>  iso_GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/iso_GCAM_regID.csv"</span><span class="op">)</span>,</span>
+<span>  FAO_ag_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/FAO_ag_items_PRODSTAT_expanded_corrected.csv"</span><span class="op">)</span>,</span>
+<span>  iso_harvest_area_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/L100.LDS_ag_HA_ha.csv"</span><span class="op">)</span>,</span>
+<span>  iso_GCAM_basin_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5"</span>,</span>
+<span>  max_CCImult <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  min_CCImult <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  rolling_avg_years <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,</span>
+<span>  minFutYear <span class="op">=</span> <span class="fl">2015</span>,</span>
+<span>  maxFutYear <span class="op">=</span> <span class="fl">2100</span>,</span>
+<span>  extrapolate_to <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
 <!-------------------------->
 </div>
@@ -386,39 +543,71 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 <!-------------------------->
 <!-------------------------->
 <p align="center">
-<img src="vignetteFigs/divider.png"></p>
-<p>The fourth step in the workflow applies the multipliers generated in the third step to GCAM reference AgProdChange and creates an updated file in xml format. A detailed workflow is shown below. The function can be tested using the example script.</p>
+</p>
+<p><img src="vignetteFigs/divider.png"></p>
+
+<p>The fourth step in the workflow applies the multipliers generated in
+the third step to GCAM reference AgProdChange and creates an updated
+file in xml format. A detailed workflow is shown below. The function can
+be tested using the example script.</p>
 <div class="section level3">
 <h3 id="workflow-3">Workflow<a class="anchor" aria-label="anchor" href="#workflow-3"></a>
 </h3>
 <p align="center" style="font-size:18px;">
-<em>Step 4 Workflow</em>
 </p>
+<p><em>Step 4 Workflow</em></p>
+
 <p align="center">
-<img src="vignetteFigs/osiris_workflow_detail_step4.jpg"></p>
+</p>
+<p><img src="vignetteFigs/osiris_workflow_detail_step4.jpg"></p>
+
 </div>
 <div class="section level3">
 <h3 id="table-3">Table<a class="anchor" aria-label="anchor" href="#table-3"></a>
 </h3>
+<table style="width:97%;" class="table">
+<colgroup>
+<col width="61%">
+<col width="18%">
+<col width="18%">
+</colgroup>
+<thead><tr class="header">
+<th>File</th>
+<th>Reference</th>
+<th>Source</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td>
+<p>L2052.AgProdChange_ag_irr_ref.csv</p>
+<p>L2052.AgProdChange_bio_irr_ref.csv</p>
+<p>GCAM_region_names.csv</p>
+</td>
+<td></td>
+<td>GCAM</td>
+</tr></tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="example-script-3">Example Script<a class="anchor" aria-label="anchor" href="#example-script-3"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span>
-<span class="co"># Step 4: create_AgProdChange_xml</span>
-<span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/create_AgProdChange_xml.html">create_AgProdChange_xml</a></span><span class="op">(</span>
-  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_create_AgProdChange_xml"</span><span class="op">)</span>,
-  ag_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_ag_irr_ref.csv"</span><span class="op">)</span>,
-  bio_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"</span><span class="op">)</span>,
-  ag_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,
-  bio_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,
-  GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/GCAM_region_names.csv"</span><span class="op">)</span>,
-  timestep <span class="op">=</span> <span class="fl">5</span>,
-  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,
-  minFutYear <span class="op">=</span> <span class="fl">2015</span>,
-  appliedto <span class="op">=</span> <span class="st">"full"</span>
-<span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JGCRI/osiris" class="external-link">osiris</a></span><span class="op">)</span></span>
+<span><span class="co"># Step 4: create_AgProdChange_xml</span></span>
+<span><span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/create_AgProdChange_xml.html">create_AgProdChange_xml</a></span><span class="op">(</span></span>
+<span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_create_AgProdChange_xml"</span><span class="op">)</span>,</span>
+<span>  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">'rcp8p5'</span>,</span>
+<span>  ssp <span class="op">=</span> <span class="st">'ssp3'</span>,</span>
+<span>  ag_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_irr_low.csv"</span><span class="op">)</span>,</span>
+<span>  bio_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"</span><span class="op">)</span>,</span>
+<span>  ag_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/ag_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
+<span>  bio_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/bio_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
+<span>  GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/GCAM_region_names.csv"</span><span class="op">)</span>,</span>
+<span>  timestep <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,</span>
+<span>  minFutYear <span class="op">=</span> <span class="fl">2015</span>,</span>
+<span>  appliedto <span class="op">=</span> <span class="st">"full"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -440,7 +629,7 @@ sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libudunits2-
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
