@@ -2,11 +2,15 @@
 title: 'osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model'
 
 tags:
-  - 
+  - R
+  - climate change
+  - agriculture
+  - GCAM
 authors:
   - name: Hamza Ahsan
     orcid: 0000-0003-1631-1789
     affiliation: 1
+    corresponding: true
   - name: Zarrar Khan
     orcid: 0000-0002-8147-8553
     affiliation: 1
@@ -24,13 +28,13 @@ affiliations:
    index: 1
  - name: Pacific Northwest National Laboratory, Richland, WA, USA
    index: 2
-date: 25 Jan 2023
+date: 13 February 2023
 bibliography: paper.bib
 ---
 
 # Summary
 
-`osiris` is an R package that couples climate change projections with agricultural assumptions used in the Global Change Analysis Model (GCAM). Specifically, this package allows users to examine the implications of changes to regional or global temperature and precipitation for agricultural crop production using GCAM. `osiris` is designed for modularity to allow the user to explore alternative climate projections, crop model emulators, and parameters relating to agricultural yield. The development of this package is part of a broader effort to analyze the impacts of climate and socioeconomic change on the coevolution of future water, energy, and land systems across the US using GCAM. Figure 1 shows a sample workflow with two potential streams, where regional (e.g., United States) or global climate data are processed by `osiris` and a set of agricultural productivity change files are generated as inputs for GCAM.
+`osiris` is an R package that couples climate change projections with agricultural assumptions used in the Global Change Analysis Model (GCAM). Specifically, this package allows users to examine the implications of changes to regional or global temperature and precipitation for agricultural crop production using GCAM. `osiris` is designed for modularity to allow the user to explore alternative climate projections, crop model emulators, and parameters relating to agricultural yield. The development of this package is part of a broader effort to analyze the impacts of climate [@Jones2023] and socioeconomic change on the coevolution of future water, energy, and land systems across the US using GCAM. Figure 1 shows a sample workflow with two potential streams, where regional (e.g., United States) or global climate data are processed by `osiris` and a set of agricultural productivity change files are generated as inputs for GCAM.
 
 ![Figure 1: Climate data reflecting a range of Representative Concentration Pathways (RCPs) and climate model uncertainty (where "hotter" and "cooler" represent diversity in climate sensitivity of the CMIP6 GCMs) are combined with Shared Socioeconomic Pathways (SSPs) to generate agricultural productivity change inputs for GCAM.](osiris_workflow.png)
 
