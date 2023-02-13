@@ -194,9 +194,9 @@ osiris::calculate_deltas_from_climate(
   minlat = -87.8638,
   minlon = -179.75,
   rollingAvgYears = 15,
-  tas_historical = "tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc",
+  tas_historical = "tas_Amon_CanESM5_historical_r1i1p1f1_gn_185001-201501.nc",
   tas_projected = "tas_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc",
-  pr_historical = "pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc",
+  pr_historical = "pr_Amon_CanESM5_historical_r1i1p1f1_gn_185001-201501.nc",
   pr_projected = "pr_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc",
   historical_start_year = 1850,
   projection_start_year = 2015
