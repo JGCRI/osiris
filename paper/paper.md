@@ -36,7 +36,7 @@ bibliography: paper.bib
 
 `osiris` is an R package that couples climate change projections with socioeconomic agricultural assumptions used in the Global Change Analysis Model (GCAM). Specifically, this package allows users to examine the implications of changes to regional or global temperature and precipitation for agricultural crop production using GCAM. `osiris` is designed for modularity to allow the user to explore alternative climate projections, crop model emulators, and parameters relating to agricultural yield. The development of this package is part of a broader effort to to provide reproducible, updatable data processing for analyzing the impacts of climate [@Jones2023] and socioeconomic change on the coevolution of future water, energy, and land systems using GCAM. Figure 1 shows a generic workflow where climate data are processed by `osiris` and a set of agricultural productivity change files are generated as inputs for GCAM.
 
-![Figure 1: Climate data are processed to generate agricultural productivity change inputs for GCAM.](osiris_workflow.png)
+![Climate data are processed to generate agricultural productivity change inputs for GCAM.](osiris_workflow.png)
 
 # Statement of need
 
