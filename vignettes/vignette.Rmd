@@ -187,20 +187,19 @@ osiris::calculate_deltas_from_climate(
   write_dir = paste0(data_folder,"/outputs_calculate_delta_from_climate"),
   monthly_growing_season = paste0(data_folder,"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"),
   monthly_harvest_season = paste0(data_folder,"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"),
-  growing_season_dir = paste0(data_folder,"/growing_season_climate_data"),
+  growing_season_dir = paste0(data_folder,"/outputs_growing_season_climate_data"),
   esm_name = "CanESM5",
   crops = c("Corn", "Wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
   minlat = -87.8638,
   minlon = -179.75,
-  rollingAvgYears = 15,
-  tas_historical = "tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc",
-  tas_projected = "tas_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc",
-  pr_historical = "pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc",
-  pr_projected = "pr_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc",
-  historical_start_year = 1850,
+  rollingAvgYears = 1,
+  tas_historical = "tas_Amon_CanESM5_historical_r1i1p1f1_gn_201001-201501.nc",
+  tas_projected = "tas_Amon_CanESM5_ssp245_r1i1p1f1_gn_201501-202101.nc",
+  pr_historical = "pr_Amon_CanESM5_historical_r1i1p1f1_gn_201001-201501.nc",
+  pr_projected = "pr_Amon_CanESM5_ssp245_r1i1p1f1_gn_201501-202101.nc",
+  historical_start_year = 2010,
   projection_start_year = 2015
-
 )
 ```
 
@@ -280,7 +279,7 @@ osiris::grid_to_basin_yield(
   crops = c("maize", "rice", "soy", "wheat"),
   esm_name = "CanESM5",
   cm_name = "LPJmL",
-  scn_name = "rcp8p5",
+  scn_name = "ssp245",
   N = 200
 )
 ```
@@ -336,18 +335,18 @@ osiris::yield_to_gcam_basin(
   write_dir = paste0(data_folder,"/outputs_yield_to_gcam_basin"),
   emulated_basin_yield_dir = paste0(data_folder,"/outputs_grid_to_basin_yield"),
   iso_GCAM_region_mapping = paste0(data_folder,"/mapping_data/iso_GCAM_regID.csv"),
-  FAO_ag_mapping = paste0(data_folder,"/mapping_data/FAO_ag_items_PRODSTAT_expanded_corrected.csv"),
-  iso_harvest_area_mapping = paste0(data_folder,"/mapping_data/L100.LDS_ag_HA_ha.csv"),
+  FAO_ag_mapping = paste0(data_folder,"/gcamdata_files/FAO_ag_items_PRODSTAT_expanded_corrected.csv"),
+  iso_harvest_area_mapping = paste0(data_folder,"/gcamdata_files/L100.LDS_ag_HA_ha.csv"),
   iso_GCAM_basin_mapping = paste0(data_folder,"/mapping_data/gcam_basin_ids.csv"),
   esm_name = "CanESM5",
-  scn_name = "rcp8p5",
+  scn_name = "ssp245",
   max_CCImult = 2.5,
   min_CCImult = 0.01,
   weight_floor_ha = 1,
-  rolling_avg_years = 15,
-  maxHistYear = 2010,
+  rolling_avg_years = 1,
+  maxHistYear = 2015,
   minFutYear = 2015,
-  maxFutYear = 2100,
+  maxFutYear = 2020,
   extrapolate_to = NULL
 )
 ```
@@ -404,12 +403,12 @@ library(osiris)
 osiris::create_AgProdChange_xml(
   write_dir = paste0(data_folder,"/outputs_create_AgProdChange_xml"),
   esm_name = 'CanESM5',
-  scn_name = 'rcp8p5',
-  ssp = 'ssp3',
-  ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_irr_low.csv"),
+  scn_name = 'ssp245',
+  ssp = 'ssp5',
+  ag_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_irr_high.csv"),
   bio_irr_ref = paste0(data_folder,"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"),
-  ag_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/ag_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
-  bio_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/bio_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"),
+  ag_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/ag_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv"),
+  bio_impacts = paste0(data_folder,"/outputs_yield_to_gcam_basin/bio_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv"),
   GCAM_region_mapping = paste0(data_folder,"/mapping_data/GCAM_region_names.csv"),
   timestep = 5,
   maxHistYear = 2010,
