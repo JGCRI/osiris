@@ -321,20 +321,19 @@ tas_Amon_CanESM5_ssp585_r1i1p1f1.nc</td>
 <span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_calculate_delta_from_climate"</span><span class="op">)</span>,</span>
 <span>  monthly_growing_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/pmonth_gslength_unifWheat_smallareamask.csv"</span><span class="op">)</span>,</span>
 <span>  monthly_harvest_season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_seasons/p_h_months_unifWheat_smallareamask.csv"</span><span class="op">)</span>,</span>
-<span>  growing_season_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/growing_season_climate_data"</span><span class="op">)</span>,</span>
+<span>  growing_season_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_growing_season_climate_data"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
 <span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,</span>
 <span>  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,</span>
 <span>  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,</span>
 <span>  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,</span>
-<span>  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  tas_historical <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_historical_r1i1p1f1_orig.nc"</span>,</span>
-<span>  tas_projected <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc"</span>,</span>
-<span>  pr_historical <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_historical_r1i1p1f1_orig.nc"</span>,</span>
-<span>  pr_projected <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_ssp585_r1i1p1f1_gn_201501-210012.nc"</span>,</span>
-<span>  historical_start_year <span class="op">=</span> <span class="fl">1850</span>,</span>
+<span>  rollingAvgYears <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  tas_historical <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_historical_r1i1p1f1_gn_201001-201501.nc"</span>,</span>
+<span>  tas_projected <span class="op">=</span> <span class="st">"tas_Amon_CanESM5_ssp245_r1i1p1f1_gn_201501-202101.nc"</span>,</span>
+<span>  pr_historical <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_historical_r1i1p1f1_gn_201001-201501.nc"</span>,</span>
+<span>  pr_projected <span class="op">=</span> <span class="st">"pr_Amon_CanESM5_ssp245_r1i1p1f1_gn_201501-202101.nc"</span>,</span>
+<span>  historical_start_year <span class="op">=</span> <span class="fl">2010</span>,</span>
 <span>  projection_start_year <span class="op">=</span> <span class="fl">2015</span></span>
-<span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
 <!-------------------------->
@@ -447,7 +446,7 @@ annual_area_harvested_rfc_crop01_ha_30mn.asc</p>
 <span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
 <span>  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,</span>
-<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  N <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
@@ -519,18 +518,18 @@ L100.LDS_ag_HA_ha.csv</td>
 <span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin"</span><span class="op">)</span>,</span>
 <span>  emulated_basin_yield_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_grid_to_basin_yield"</span><span class="op">)</span>,</span>
 <span>  iso_GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/iso_GCAM_regID.csv"</span><span class="op">)</span>,</span>
-<span>  FAO_ag_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/FAO_ag_items_PRODSTAT_expanded_corrected.csv"</span><span class="op">)</span>,</span>
-<span>  iso_harvest_area_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/L100.LDS_ag_HA_ha.csv"</span><span class="op">)</span>,</span>
+<span>  FAO_ag_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/gcamdata_files/FAO_ag_items_PRODSTAT_expanded_corrected.csv"</span><span class="op">)</span>,</span>
+<span>  iso_harvest_area_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/gcamdata_files/L100.LDS_ag_HA_ha.csv"</span><span class="op">)</span>,</span>
 <span>  iso_GCAM_basin_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/gcam_basin_ids.csv"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">"CanESM5"</span>,</span>
-<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_CCImult <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>  min_CCImult <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  rolling_avg_years <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,</span>
+<span>  rolling_avg_years <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  maxHistYear <span class="op">=</span> <span class="fl">2015</span>,</span>
 <span>  minFutYear <span class="op">=</span> <span class="fl">2015</span>,</span>
-<span>  maxFutYear <span class="op">=</span> <span class="fl">2100</span>,</span>
+<span>  maxFutYear <span class="op">=</span> <span class="fl">2020</span>,</span>
 <span>  extrapolate_to <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <!-------------------------->
@@ -596,12 +595,12 @@ be tested using the example script.</p>
 <span><span class="fu">osiris</span><span class="fu">::</span><span class="fu"><a href="../reference/create_AgProdChange_xml.html">create_AgProdChange_xml</a></span><span class="op">(</span></span>
 <span>  write_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_create_AgProdChange_xml"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">'CanESM5'</span>,</span>
-<span>  scn_name <span class="op">=</span> <span class="st">'rcp8p5'</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">'ssp3'</span>,</span>
-<span>  ag_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_irr_low.csv"</span><span class="op">)</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">'ssp245'</span>,</span>
+<span>  ssp <span class="op">=</span> <span class="st">'ssp5'</span>,</span>
+<span>  ag_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_irr_high.csv"</span><span class="op">)</span>,</span>
 <span>  bio_irr_ref <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/reference_agprodchange/L2052.AgProdChange_bio_irr_ref.csv"</span><span class="op">)</span>,</span>
-<span>  ag_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/ag_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
-<span>  bio_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/bio_impacts_CanESM5_rcp8p5_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA31_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
+<span>  ag_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/ag_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
+<span>  bio_impacts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/outputs_yield_to_gcam_basin/bio_impacts_CanESM5_ssp245_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA3_gridcull_allyroutlier.csv"</span><span class="op">)</span>,</span>
 <span>  GCAM_region_mapping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">data_folder</span>,<span class="st">"/mapping_data/GCAM_region_names.csv"</span><span class="op">)</span>,</span>
 <span>  timestep <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  maxHistYear <span class="op">=</span> <span class="fl">2010</span>,</span>
