@@ -6,22 +6,22 @@
 \usage{
 get_example_data(
   write_dir = getwd(),
-  dir_name = "Osiris_Data",
-  data_link = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"
+  dir_name = "Osiris_Data_Test",
+  data_link = "https://zenodo.org/record/7530067/files/Osiris_Data_Test.zip?download=1"
 )
 }
 \arguments{
 \item{write_dir}{Default = getwd()}
 
-\item{dir_name}{= "Osiris_Data". Name of directory to install zip file to.}
+\item{dir_name}{= "Osiris_Data_Test". Name of directory to install zip file to.}
 
-\item{data_link}{Default = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"}
+\item{data_link}{Default = "https://zenodo.org/record/7530067/files/Osiris_Data_Test.zip?download=1"}
 }
 \value{
 number
 }
 \description{
-Function to download the data files from zenodo that are needed to run Osiris.
+Function to download the test data files from zenodo that are needed to run Osiris.
 }
 \examples{
 \dontrun{
