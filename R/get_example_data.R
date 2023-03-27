@@ -1,10 +1,10 @@
 #' get_example_data
 #'
-#' Function to download the data files from zenodo that are needed to run Osiris.
+#' Function to download the test data files from zenodo that are needed to run Osiris.
 #'
 #' @param write_dir Default = getwd()
-#' @param dir_name = "Osiris_Data". Name of directory to install zip file to.
-#' @param data_link Default = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1"
+#' @param dir_name = "Osiris_Data_Test". Name of directory to install zip file to.
+#' @param data_link Default = "https://zenodo.org/record/7530067/files/Osiris_Data_Test.zip?download=1"
 #' @keywords test
 #' @return number
 #' @importFrom rlang :=
@@ -17,8 +17,8 @@
 #' }
 
 get_example_data <- function(write_dir = getwd(),
-                             dir_name = "Osiris_Data",
-                             data_link = "https://zenodo.org/record/7474112/files/Osiris_Data.zip?download=1") {
+                             dir_name = "Osiris_Data_Test",
+                             data_link = "https://zenodo.org/record/7530067/files/Osiris_Data_Test.zip?download=1") {
 
 
   #.........................
