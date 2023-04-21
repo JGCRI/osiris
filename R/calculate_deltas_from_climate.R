@@ -70,6 +70,13 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   # Increase memory limits
   utils::memory.limit(size=56000)
 
+  # Check that the crops in the input argument are valid
+  crops <- stringi::stri_trans_totitle(crops)
+  crops <- unique(crops)
+  if(!all(crops %in% c("Corn", "Wheat", "Rice", "Soy"))) {
+    stop("The crops that were defined are either misspelled or not included in this package.
+         The crops currently included are: Corn, Wheat, Rice, Soy")
+  }
 
   #.........................
   # Custom functions
@@ -205,6 +212,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       dplyr::filter(year >= 1965)
 
     rlang::inform(paste0("Reading in and reshaping ncdf files complete."))
+
 
     # pull off the climate data for each crop-irr combo
     for(crp in crops){
