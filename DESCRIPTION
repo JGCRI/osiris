@@ -30,7 +30,8 @@ Imports:
 	gcamdata,
 	sf,
 	purrr,
-	ggplot2
+	ggplot2,
+	stringi
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
