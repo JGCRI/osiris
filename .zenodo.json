@@ -2,7 +2,7 @@
     "language": "eng", 
     "license": "BSD-2-Clause", 
     "title": "osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model", 
-    "version": "v1.0.1", 
+    "version": "v1.0.3", 
     "upload_type": "software", 
     "keywords": [
         "osiris", 
