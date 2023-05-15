@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^Meta$
 ^doc$
 ^.*\.Rproj$
@@ -33,3 +35,4 @@ cheatsheet.pdf
 ^CONTRIBUTE.md$
 ^cran-comments.md$
 ^csheet.pdf$
+^.zenodo.json$
