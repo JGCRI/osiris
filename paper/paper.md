@@ -1,35 +1,37 @@
 ---
-title: 'osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model'
-
+title: 'osiris: An R package to process climate impacts on agricultural yields for
+  the Global Change Analysis Model'
 tags:
-  - R
-  - climate change
-  - agriculture
-  - GCAM
+- R
+- climate change
+- agriculture
+- GCAM
+date: "13 February 2023"
+output: pdf_document
 authors:
-  - name: Hamza Ahsan
-    orcid: 0000-0003-1631-1789
-    affiliation: 1
-    corresponding: true
-  - name: Zarrar Khan
-    orcid: 0000-0002-8147-8553
-    affiliation: 1
-  - name: Abigail Snyder
-    orcid: 0000-0002-9034-9948
-    affiliation: 1 
-  - name: Page Kyle
-    orcid: 0000-0002-1257-8358
-    affiliation: 1 
-  - name: Chris Vernon
-    orcid: 0000-0002-3406-6214
-    affiliation: 2  
-affiliations:
- - name: Joint Global Change Research Institute, Pacific Northwest National Laboratory, College Park, MD, USA
-   index: 1
- - name: Pacific Northwest National Laboratory, Richland, WA, USA
-   index: 2
-date: 13 February 2023
+- name: Hamza Ahsan
+  orcid: "0000-0003-1631-1789"
+  affiliation: 1
+  corresponding: yes
+- name: Zarrar Khan
+  orcid: "0000-0002-8147-8553"
+  affiliation: 1
+- name: Abigail Snyder
+  orcid: "0000-0002-9034-9948"
+  affiliation: 1
+- name: Page Kyle
+  orcid: "0000-0002-1257-8358"
+  affiliation: 1
+- name: Chris Vernon
+  orcid: "0000-0002-3406-6214"
+  affiliation: 2
 bibliography: paper.bib
+affiliations:
+- name: Joint Global Change Research Institute, Pacific Northwest National Laboratory,
+    College Park, MD, USA
+  index: 1
+- name: Pacific Northwest National Laboratory, Richland, WA, USA
+  index: 2
 ---
 
 # Summary
