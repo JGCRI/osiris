@@ -3,6 +3,7 @@
 [![test_coverage](https://github.com/JGCRI/osiris/actions/workflows/test_coverage.yml/badge.svg?branch=main)](https://github.com/JGCRI/osiris/actions/workflows/test_coverage.yml)
 [![codecov](https://codecov.io/gh/JGCRI/osiris/branch/main/graph/badge.svg?token=XQ913U4IYM)](https://codecov.io/gh/JGCRI/osiris) 
 [![docs](https://github.com/JGCRI/osiris/actions/workflows/docs.yaml/badge.svg?branch=main)](https://github.com/JGCRI/osiris/actions/workflows/docs.yaml)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05226/status.svg)](https://doi.org/10.21105/joss.05226)
 <!-- badges: end -->
 
 
@@ -25,8 +26,7 @@
 # <a name="Citation"></a>Citation
 <!-- ------------------------>
 <!-- ------------------------>
-
-Ahsan, H., Khan, Z., Snyder, A., Kyle, P., Vernon, C.R. 2023. osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model. (Manuscript submitted for publication) Journal of Open Source Software, DOI: XXXX
+Ahsan et al., (2023). osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model. Journal of Open Source Software, 8(85), 5226, https://doi.org/10.21105/joss.05226
 
 <!-- ------------------------>
 <!-- ------------------------>
