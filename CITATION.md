@@ -5,7 +5,7 @@
 <!-------------------------->
 <!-------------------------->
 
-Snyder, A., Ahsan, H., Khan, Z., Kyle, P., Vernon, C.R. 2022. osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). (In progress) Journal of Open Source Software, DOI: XXXX
+Ahsan, H., Khan, Z., Snyder, A., Kyle, P., & Vernon, C.R. (2023). osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model. Journal of Open Source Software, 8(85), 5226. https://doi.org/10.21105/joss.05226 
 
 
 <!-------------------------->
@@ -15,13 +15,16 @@ Snyder, A., Ahsan, H., Khan, Z., Kyle, P., Vernon, C.R. 2022. osiris: An R packa
 <!-------------------------->
 
 ```
-@article{snyder2022osiris,
-  title={osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM)},
-  author = {Abigail Snyder and Hamza Ahsan and Zarrar Khan and Page Kyle and Chris R. Vernon},
-  year = {2022},
-  note = {In Progress},
-  url = {https://github.com/JGCRI/osiris},
-  doi = {xxx},
-  journal={Journal of Open Source Software}
+@article{Ahsan2023,
+  doi = {10.21105/joss.05226},
+  url = {https://doi.org/10.21105/joss.05226},
+  year = {2023},
+  publisher = {The Open Journal},
+  volume = {8},
+  number = {85},
+  pages = {5226},
+  author = {Hamza Ahsan and Zarrar Khan and Abigail Snyder and Page Kyle and Chris Vernon},
+  title = {osiris: An R package to process climate impacts on agricultural yields for the Global Change Analysis Model},
+  journal = {Journal of Open Source Software}
 }
 ```

@@ -139,7 +139,9 @@ library(osiris)
 get_example_data()
 ```
 
-The `get_example_data()` function takes in two arguments, `write_dir` (default is the current directory) and `data_link` (default is the zenodo link to the Osiris data).
+The `get_example_data()` function takes in two arguments, `write_dir` (default is the current directory) and `data_link` (default is the zenodo link to the Osiris data). 
+
+After the supplementary data is installed, set `data_folder` to the location of the folder.
 
 <!-------------------------->
 
