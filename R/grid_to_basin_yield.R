@@ -10,6 +10,7 @@
 #' @param area_dir Default = NULL
 #' @param basin_grid Default = NULL
 #' @param basin_id Default = NULL
+#' @param region_id Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter
 #' @param write_dir Default = "outputs_grid_to_basin_yield". Output Folder
 #' @param wheat_area Default = NULL Spring and winter wheat areas
 #' @param crops Default = c("maize", "rice", "soy", "wheat")
@@ -35,6 +36,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 area_dir = NULL,
                                 basin_grid = NULL,
                                 basin_id = NULL,
+                                region_id = NULL,
                                 write_dir = "outputs_grid_to_basin_yield",
                                 wheat_area = NULL,
                                 crops = c("maize", "rice", "soy", "wheat"),
@@ -352,9 +354,17 @@ grid_to_basin_yield <- function(carbon = NULL,
   #.........................
 
   tibble::as_tibble(utils::read.csv(paste0(basin_grid), stringsAsFactors = F)) %>%
-    dplyr::select(long, lati, basinID) %>%
+    dplyr::select(long, lati, basinID, regID) %>%
     dplyr::filter(basinID != 999) ->
     basinGrid
+
+  # Filter region ID to GCAM region (if applicable)
+  if (!is.null(region_id)) {
+    basinGrid <- dplyr::filter(basinGrid, regID == region_id) %>%
+      dplyr::select(-regID)
+  } else {
+    basinGrid <- dplyr::select(basinGrid, -regID)
+  }
 
   basinIDs <- tibble::as_tibble(utils::read.csv(paste0(basin_id), stringsAsFactors = F))
 
@@ -689,7 +699,6 @@ grid_to_basin_yield <- function(carbon = NULL,
     # Ok now we have all the info we need for different grids.
     # Make the main tables of inputs for ir, rf
     ir_tp %>%
-      dplyr::mutate(deltaP = (deltaP-1)) %>%
       # TODO: update this with your specific info for nitrogen and CO2 in
       #       your scenario:
       dplyr::mutate(N=N) %>%
@@ -702,7 +711,6 @@ grid_to_basin_yield <- function(carbon = NULL,
       ir_inputs
 
     rf_tp %>%
-      dplyr::mutate(deltaP = (deltaP-1)) %>%
       # TODO: update this with your specific info for nitrogen and CO2 in
       #       your scenario:
       dplyr::mutate(N=N) %>%
@@ -783,8 +791,7 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     # bind the missing basins
     dplyr::bind_rows(yield.basin, mb) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(year > 2005) ->
+      dplyr::ungroup() ->
       yieldByBasin
 
 

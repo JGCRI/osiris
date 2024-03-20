@@ -283,7 +283,9 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
     dplyr::mutate(ISO = tolower(as.character((ISO)))) %>%
     dplyr::rename(iso = ISO) %>%
     # add region id
-    dplyr::left_join(dplyr::select(iso_GCAM_regID, iso, GCAM_region_ID), by ="iso")  ->
+    dplyr::left_join(dplyr::select(iso_GCAM_regID, iso, GCAM_region_ID), by ="iso") %>%
+    # replace Soy with soy
+    dplyr::mutate(crop = dplyr::case_when(crop == "Soy" ~ "soy", TRUE ~ crop)) ->
     emu_impacts_AllYears_base_glu_irr_isicrop_c3avg
 
 
@@ -342,7 +344,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   # if removing outliers
   # identify outliers for ag:
   ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears %>%
-    dplyr::group_by(rcp, gcm, cropmodel, GCAM_commodity, irr) %>%
+    dplyr::group_by(rcp, gcm, cropmodel, GCAM_commodity, irr, GLU) %>%
     dplyr::mutate(outlier = is_outlier(impact)) %>%
     dplyr::ungroup() ->
     ag_tmp

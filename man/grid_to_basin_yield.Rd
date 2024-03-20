@@ -12,6 +12,7 @@ grid_to_basin_yield(
   area_dir = NULL,
   basin_grid = NULL,
   basin_id = NULL,
+  region_id = NULL,
   write_dir = "outputs_grid_to_basin_yield",
   wheat_area = NULL,
   crops = c("maize", "rice", "soy", "wheat"),
@@ -35,6 +36,8 @@ grid_to_basin_yield(
 \item{basin_grid}{Default = NULL}
 
 \item{basin_id}{Default = NULL}
+
+\item{region_id}{Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter}
 
 \item{write_dir}{Default = "outputs_grid_to_basin_yield". Output Folder}
 
