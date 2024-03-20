@@ -101,6 +101,7 @@ gcam basin level via MIRCA harvested areas.</p>
 <span>  area_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  basin_grid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  basin_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  region_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  write_dir <span class="op">=</span> <span class="st">"outputs_grid_to_basin_yield"</span>,</span>
 <span>  wheat_area <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,</span>
@@ -139,6 +140,10 @@ gcam basin level via MIRCA harvested areas.</p>
 
 <dt>basin_id</dt>
 <dd><p>Default = NULL</p></dd>
+
+
+<dt>region_id</dt>
+<dd><p>Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter</p></dd>
 
 
 <dt>write_dir</dt>
