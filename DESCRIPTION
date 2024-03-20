@@ -31,7 +31,8 @@ Imports:
 	sf,
 	purrr,
 	ggplot2,
-	stringi
+	stringi,
+	tidytable
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

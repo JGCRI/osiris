@@ -206,7 +206,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     x <- cbind(grid, x1, x2) %>%
       dplyr::select(unique(colnames(.))) %>%
       tidyr::gather(time, value, -lon, -lat) %>%
-      tidyr::separate(time, into = c('month', 'year'), sep = '~') %>%
+      tidytable::separate(col = time, into = c('month', 'year'), sep = '~') %>%
       dplyr::mutate(year = as.integer(year),
              month=as.integer(month)) %>%
       dplyr::filter(year >= 1965)
