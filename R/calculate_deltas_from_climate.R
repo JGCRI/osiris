@@ -5,6 +5,7 @@
 #' @param climate_dir Default = NULL
 #' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
 #' @param esm_name Default = NULL
+#' @param scn_name Default = NULL
 #' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
 #' @param minlat Default = -87.8638
@@ -33,6 +34,7 @@
 calculate_deltas_from_climate <- function(climate_dir = NULL,
                                           write_dir = "outputs_calculate_delta_from_climate",
                                           esm_name = NULL,
+                                          scn_name = NULL,
                                           crops = c("Corn", "Wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
                                           minlat = -87.8638,
@@ -343,7 +345,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       # combine and save off:
       deltaT %>%
         dplyr::left_join(deltaP, by = c("lon", "lat", "latgrid", "longrid", "crop", "irr", 'year'))%>%
-        utils::write.csv(., paste0(write_dir, '/', esm_name, '_',tolower(crp), '_', tolower(irrig), '_smooth_deltaT_deltaP.csv'),
+        utils::write.csv(., paste0(write_dir, '/', esm_name, '_', scn_name, '_', tolower(crp), '_', tolower(irrig), '_smooth_deltaT_deltaP.csv'),
                   row.names = F)
 
     }

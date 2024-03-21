@@ -8,6 +8,7 @@ calculate_deltas_from_climate(
   climate_dir = NULL,
   write_dir = "outputs_calculate_delta_from_climate",
   esm_name = NULL,
+  scn_name = NULL,
   crops = c("Corn", "Wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
   minlat = -87.8638,
@@ -30,6 +31,8 @@ calculate_deltas_from_climate(
 \item{write_dir}{Default = "outputs_calculate_delta_from_climate". Output Folder}
 
 \item{esm_name}{Default = NULL}
+
+\item{scn_name}{Default = NULL}
 
 \item{crops}{Default = c("Corn", "Wheat", "Rice", "Soy")}
 
