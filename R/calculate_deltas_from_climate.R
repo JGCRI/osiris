@@ -236,7 +236,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
         x_comb_merge  %>%
           keep_months_and_avg(., crp=crp, irrig=irrig) %>%
-          utils::write.csv(., paste0(growing_season_dir, '/', esm_name, '_', varname,
+          utils::write.csv(., paste0(growing_season_dir, '/', esm_name, '_', scn_name,'_', varname,
                               '_', crp, '_', irrig,
                               '_growing_season_avg.csv'),
                     row.names = F)
@@ -282,7 +282,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     for(irrig in irrigation_rainfed){
 
       # get the T and P growing season average files loaded for this crop-irr combo:
-      filenames <- list.files(growing_season_dir, pattern = esm_name, full.names=TRUE, recursive=FALSE)
+      filenames <- list.files(growing_season_dir, pattern = paste0(esm_name, '_', scn_name), full.names=TRUE, recursive=FALSE)
       filenames <- filenames[grepl(paste0(crp, '_', irrig), filenames)]
       tas_file <- filenames[grepl('_tas_', filenames)]
       pr_file <- filenames[grepl('_pr_', filenames)]
@@ -341,6 +341,13 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
         dplyr::mutate(deltaP = 1 +((value - basePr)/basePr)) %>% #deltaP is multiplicative
         dplyr::select(-basePr, -value) ->
         deltaP
+
+      # set longrid and latgrid to integer (to address strange error on pic where there
+      # is a mismatch in column type when joining deltaT and deltaP below)
+      cols <- names(deltaP)[3:4] # both the same for deltaT and deltaP
+      deltaT[cols] <- lapply(deltaT[cols], as.integer)
+      deltaP[cols] <- lapply(deltaP[cols], as.integer)
+
 
       # combine and save off:
       deltaT %>%
