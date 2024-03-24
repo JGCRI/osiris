@@ -70,9 +70,6 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
     wrf_ncdf_sf <- wrf_ncdf_ras_df %>%
       sf::st_as_sf(coords = c("lon", "lat"), crs = 4326)
 
-    # Reproject to correct crs
-    sf::st_geometry(wrf_ncdf_sf) <- sf::st_geometry(wrf_ncdf_sf) + c(360, 0)
-
     # Reproject to correct resolution
     wrf_osiris_ras <- raster::rasterize(wrf_ncdf_sf,
                                         osiris_ncdf_ras,
@@ -114,7 +111,7 @@ wrf_to_osiris <- function(wrf_ncdf = NULL,
       # Retrieve the number of layers from each file, which is equivalent to the number
       # of time steps, and define time stamp series
       layer_num <- raster::nlayers(wrf_T2_brick[[i]])
-      initial_time <- as.POSIXct(paste0(substr(basename(list.filepath[i]), 34, 43), " ", gsub("_", ":", substr(basename(list.filepath[i]), 45, 52))), tz = "UTC")
+      initial_time <- as.POSIXct(paste0(stringr::str_extract(list.filepath[i], "[0-9]{4}-[0-9]{2}-[0-9]{2}"), " 00:00:00"), tz = "UTC")
       time_stamp[[i]] <- as.character(seq(from = initial_time, length.out = layer_num, by = time_step))
     }
 
