@@ -12,11 +12,10 @@
 #' @param basin_id Default = NULL
 #' @param region_id Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter
 #' @param write_dir Default = "outputs_grid_to_basin_yield". Output Folder
-#' @param wheat_area Default = NULL Spring and winter wheat areas
-#' @param crops Default = c("maize", "rice", "soy", "wheat")
+#' @param crops Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")
 #' @param esm_name Default = 'WRF'
 #' @param cm_name Default = 'LPJmL'
-#' @param scn_name Default = 'rcp8p5_hot'
+#' @param scn_name Default = 'rcp8p5_hotter'
 #' @param N Default = 200. Assuming nothing is nitrogen limited and apply across grids
 #' @keywords test
 #' @return number
@@ -38,11 +37,10 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 basin_id = NULL,
                                 region_id = NULL,
                                 write_dir = "outputs_grid_to_basin_yield",
-                                wheat_area = NULL,
-                                crops = c("maize", "rice", "soy", "wheat"),
+                                crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
                                 esm_name = 'WRF',
                                 cm_name = 'LPJmL',
-                                scn_name = 'rcp8p5_hot',
+                                scn_name = 'rcp8p5_hotter',
                                 N = 200) {
 
 
@@ -70,7 +68,7 @@ grid_to_basin_yield <- function(carbon = NULL,
   # Check that the crops in the input argument are valid
   crops <- tolower(crops)
   crops <- unique(crops)
-  if(!all(crops %in% c("maize", "rice", "soy", "wheat"))) {
+  if(!all(crops %in% c("maize", "rice", "soy", "spring wheat", "winter wheat"))) {
     stop("The crops that were defined are either misspelled or not included in this package.
          The crops currently included are: maize, rice, soy, wheat")
   }
@@ -282,6 +280,8 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     if(unique(halfdeg_yield$crop) == 'Corn'){
       area_crop_name <- 'maize'
+    }else if(unique(halfdeg_yield$crop) %in% c('Spring Wheat', 'Winter Wheat')){
+      area_crop_name <- 'wheat'
     }else{
       area_crop_name <- tolower(unique(halfdeg_yield$crop))
     }
@@ -305,6 +305,7 @@ grid_to_basin_yield <- function(carbon = NULL,
       dplyr::left_join(area.grid, by = c("lon", "lat")) %>%
       # yield and year
       dplyr::left_join(halfdeg_yield, by = c("lon", "lat")) %>%
+      stats::na.omit() %>%
       # aggregate to basin:
       dplyr::group_by(gcm, cropmodel, crop, irr, basinID, year) %>%
       dplyr::summarise(yield = stats::weighted.mean(yield, w = HA),
@@ -313,9 +314,7 @@ grid_to_basin_yield <- function(carbon = NULL,
       # calculate basin level yield
       dplyr::rename(id = basinID) %>%
       dplyr::mutate(yield = dplyr::if_else(HA == 0, 0, yield),
-                    rcp = scn_name) %>%
-      tidyr::replace_na(list(yield=0)) %>%
-      stats::na.omit() ->
+                    rcp = scn_name) ->
       yield_basin
     return(yield_basin)
   }
@@ -346,8 +345,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                                  grepl("crop08", areafilelist)]
 
   # CO2
-  # TODO update as you need
-  carbon <- utils::read.csv(paste0(carbon), stringsAsFactors = F) #cmip5 co2
+  carbon <- utils::read.csv(paste0(carbon), stringsAsFactors = F)
 
   #.........................
   # Maps
@@ -419,174 +417,8 @@ grid_to_basin_yield <- function(carbon = NULL,
     rlang::inform(paste0("Generating basin yield for ", crop))
 
     # yield emu netcdf
-    ncfname <- emulatorlist[grepl(crop, emulatorlist) & grepl(cm_name, emulatorlist)]
+    ncfname <- emulatorlist[grepl(sub(" ", "_", crop), emulatorlist) & grepl(cm_name, emulatorlist)]
 
-    # Wheat is weird
-    # TODO:
-    if(grepl("^wheat$",crop,ignore.case=T)){
-      # open up both winter and spring wheat response functions:
-      ncin_swh <- ncdf4::nc_open(ncfname[grepl("spring", ncfname)])
-
-      nc_lon <- ncdf4::ncvar_get(ncin_swh,'lon')
-      nc_lat <- ncdf4::ncvar_get(ncin_swh, 'lat')
-      grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
-
-      # pull and reshape spring wheat rainfed params
-      swh_rf_params_3d_array <- ncdf4::ncvar_get(ncin_swh, 'K_rf')
-      indlon <- which(dim(swh_rf_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(swh_rf_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(swh_rf_params_3d_array)==ncin_swh$dim$poly$len)
-
-      swh_rf_params <-cbind(grid,
-                            t(rbind(matrix(aperm(swh_rf_params_3d_array, c(indpoly,indlon,indlat)),
-                                           ncin_swh$dim$poly$len,length(nc_lat)*length(nc_lon))
-                            ))
-      )
-      rm(swh_rf_params_3d_array)
-
-      # pull and reshape spring wheat irrigated params
-      swh_ir_params_3d_array <- ncdf4::ncvar_get(ncin_swh, 'K_ir')
-      indlon <- which(dim(swh_ir_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(swh_ir_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(swh_ir_params_3d_array)==ncin_swh$dim$poly$len)
-
-      swh_ir_params <-cbind(grid,
-                            t(rbind(matrix(aperm(swh_ir_params_3d_array, c(indpoly,indlon,indlat)),
-                                           ncin_swh$dim$poly$len,length(nc_lat)*length(nc_lon))
-                            ))
-      )
-      rm(swh_ir_params_3d_array)
-
-      ncin_wwh <- ncdf4::nc_open(ncfname[grepl("winter", ncfname)])
-
-      nc_lon <- ncdf4::ncvar_get(ncin_wwh,'lon')
-      nc_lat <- ncdf4::ncvar_get(ncin_wwh, 'lat')
-      grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
-
-      # pull and reshape winter wheat rainfed params
-      wwh_rf_params_3d_array <- ncdf4::ncvar_get(ncin_wwh, 'K_rf')
-      indlon <- which(dim(wwh_rf_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(wwh_rf_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(wwh_rf_params_3d_array)==ncin_wwh$dim$poly$len)
-
-      wwh_rf_params <-cbind(grid,
-                            t(rbind(matrix(aperm(wwh_rf_params_3d_array, c(indpoly,indlon,indlat)),
-                                           ncin_wwh$dim$poly$len,length(nc_lat)*length(nc_lon))
-                            ))
-      )
-      rm(wwh_rf_params_3d_array)
-
-      # pull and reshape winter wheat irrigated params
-      wwh_ir_params_3d_array <- ncdf4::ncvar_get(ncin_wwh, 'K_ir')
-      indlon <- which(dim(wwh_ir_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(wwh_ir_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(wwh_ir_params_3d_array)==ncin_swh$dim$poly$len)
-
-      wwh_ir_params <-cbind(grid,
-                            t(rbind(matrix(aperm(wwh_ir_params_3d_array, c(indpoly,indlon,indlat)),
-                                           ncin_swh$dim$poly$len,length(nc_lat)*length(nc_lon))
-                            ))
-      )
-      rm(wwh_ir_params_3d_array)
-
-      # apply a unifying mask so you just have one df for each of
-      # irr, rfd wheat params:
-      #(sourced from https://zenodo.org/record/3773827)
-      wheat_area <- ncdf4::nc_open(wheat_area)
-
-      nc_lon <- ncdf4::ncvar_get(wheat_area,'lon')
-      nc_lat <- ncdf4::ncvar_get(wheat_area, 'lat')
-      grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
-
-      # pull and reshape irrigated spring wheat areas
-      swh_ir_area <- ncdf4::ncvar_get(wheat_area, 'swh_ir_area')
-      swh_ir_area[which(is.na(swh_ir_area))] <- 0
-      indlon <- which(dim(swh_ir_area)==length(nc_lon))
-      indlat <- which(dim(swh_ir_area)==length(nc_lat))
-
-      swh_ir_area_summary <-cbind(grid,
-                                  swh_ir_area=t(rbind(matrix(aperm(swh_ir_area, c(indlon,indlat)),1,length(nc_lat)*length(nc_lon))))
-      )
-
-      # pull and reshape irrigated winter wheat areas
-      wwh_ir_area <- ncdf4::ncvar_get(wheat_area, 'wwh_ir_area')
-      wwh_ir_area[which(is.na(wwh_ir_area))] <- 0
-      indlon <- which(dim(wwh_ir_area)==length(nc_lon))
-      indlat <- which(dim(wwh_ir_area)==length(nc_lat))
-
-      wwh_ir_area_summary <-cbind(grid,
-                                  wwh_ir_area=t(rbind(matrix(aperm(wwh_ir_area, c(indlon,indlat)),1,length(nc_lat)*length(nc_lon))))
-      )
-
-      # combine irrigated spring and winter wheat areas
-      wheat_ir_area <- dplyr::left_join(swh_ir_area_summary, wwh_ir_area_summary, by = c("lon", "lat")) %>%
-        dplyr::mutate(diff = swh_ir_area - wwh_ir_area) %>%
-        dplyr::mutate(swh_ir = dplyr::if_else(diff > 0, 1, 0)) %>%
-        dplyr::mutate(wwh_ir = dplyr::if_else(diff < 0, 1, 0)) %>%
-        dplyr::select(lon, lat, swh_ir, wwh_ir)
-
-      # pull and reshape rainfed spring wheat areas
-      swh_rf_area <- ncdf4::ncvar_get(wheat_area, 'swh_rf_area')
-      swh_rf_area[which(is.na(swh_rf_area))] <- 0
-      indlon <- which(dim(swh_rf_area)==length(nc_lon))
-      indlat <- which(dim(swh_rf_area)==length(nc_lat))
-
-      swh_rf_area_summary <-cbind(grid,
-                                  swh_rf_area=t(rbind(matrix(aperm(swh_rf_area, c(indlon,indlat)),1,length(nc_lat)*length(nc_lon))))
-      )
-
-      # pull and reshape rainfed winter wheat areas
-      wwh_rf_area <- ncdf4::ncvar_get(wheat_area, 'wwh_rf_area')
-      wwh_rf_area[which(is.na(wwh_rf_area))] <- 0
-      indlon <- which(dim(wwh_rf_area)==length(nc_lon))
-      indlat <- which(dim(wwh_rf_area)==length(nc_lat))
-
-      wwh_rf_area_summary <-cbind(grid,
-                                  wwh_rf_area=t(rbind(matrix(aperm(wwh_rf_area, c(indlon,indlat)),1,length(nc_lat)*length(nc_lon))))
-      )
-
-      # combine rainfed spring and winter wheat areas
-      wheat_rf_area <- dplyr::left_join(swh_rf_area_summary, wwh_rf_area_summary, by = c("lon", "lat")) %>%
-        dplyr::mutate(diff = swh_rf_area - wwh_rf_area) %>%
-        dplyr::mutate(swh_rf = dplyr::if_else(diff > 0, 1, 0)) %>%
-        dplyr::mutate(wwh_rf = dplyr::if_else(diff < 0, 1, 0)) %>%
-        dplyr::select(lon, lat, swh_rf, wwh_rf)
-
-
-      # multiply irrigated spring and winter wheat parameters by mask
-      swh_ir_params <- swh_ir_params %>%
-        dplyr::left_join(wheat_ir_area, by = c("lon", "lat")) %>%
-        dplyr::mutate(dplyr::across(3:36, ~ . * swh_ir)) %>%
-        dplyr::select(-c(swh_ir, wwh_ir))
-
-      wwh_ir_params <- wwh_ir_params %>%
-        dplyr::left_join(wheat_ir_area, by = c("lon", "lat")) %>%
-        dplyr::mutate(dplyr::across(3:36, ~ . * wwh_ir)) %>%
-        dplyr::select(-c(swh_ir, wwh_ir))
-
-      # combine irrigated spring and wheat parameters
-      ir_params <- cbind(grid, Reduce("+", lapply(mget(c("swh_ir_params", "wwh_ir_params")), "[", paste0(1:34))))
-
-
-      # multiply rainfed spring and winter wheat parameters by mask
-      swh_rf_params <- swh_rf_params %>%
-        dplyr::left_join(wheat_rf_area, by = c("lon", "lat")) %>%
-        dplyr::mutate(dplyr::across(3:36, ~ . * swh_rf)) %>%
-        dplyr::select(-c(swh_rf, wwh_rf))
-
-      wwh_rf_params <- wwh_rf_params %>%
-        dplyr::left_join(wheat_rf_area, by = c("lon", "lat")) %>%
-        dplyr::mutate(dplyr::across(3:36, ~ . * wwh_rf)) %>%
-        dplyr::select(-c(swh_rf, wwh_rf))
-
-      # combine rainfed spring and wheat parameters
-      rf_params <- cbind(grid, Reduce("+", lapply(mget(c("swh_rf_params", "wwh_rf_params")), "[", paste0(1:34))))
-
-      rm(wwh_rf_params, wwh_ir_params, swh_rf_params, swh_ir_params, wheat_rf_area,
-         wheat_ir_area, swh_ir_area_summary, swh_rf_area_summary, wwh_ir_area_summary,
-         wwh_rf_area_summary )
-
-    }else{
       # get emulation parameters.
       ncin <- ncdf4::nc_open(ncfname)
 
@@ -621,7 +453,6 @@ grid_to_basin_yield <- function(carbon = NULL,
       )
       rm(ir_params_3d_array)
       ncdf4::nc_close(ncin)
-    }
 
     # The crop responses include every grid cells, even ones with 0 response.
     # Drop the cells with 0 response to speed things up.
@@ -655,6 +486,7 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     # get the grid of the climate inputs
     rf_tp %>%
+      tidyr::drop_na() %>%
       dplyr::select(lon, lat) %>%
       dplyr::distinct() %>%
       dplyr::mutate(orig_lon = lon,
@@ -662,6 +494,7 @@ grid_to_basin_yield <- function(carbon = NULL,
       rfinput_grid
 
     ir_tp %>%
+      tidyr::drop_na() %>%
       dplyr::select(lon, lat) %>%
       dplyr::distinct() %>%
       dplyr::mutate(orig_lon = lon,
@@ -683,15 +516,15 @@ grid_to_basin_yield <- function(carbon = NULL,
     # now call the grid_matching function so that we can have
     # the table of whch climate grids pair with which crop grids.
     ## TODO: this is where to switch which grid is finer and coarser:
-    ir_matched_grids <- grid_matching(finer_grid = ircrop_grid,
-                                      coarser_grid = irinput_grid %>%
-                                        dplyr::select(-orig_lon)) %>%
+    ir_matched_grids <- grid_matching(finer_grid = irinput_grid%>%
+                                        dplyr::select(-orig_lon),
+                                      coarser_grid = ircrop_grid )%>%
       dplyr::rename(crop_lon = lon, crop_lat = lat,
                     clim_lon = coarse_lon, clim_lat = coarse_lat)
 
-    rf_matched_grids <- grid_matching(finer_grid = rfcrop_grid,
-                                      coarser_grid = rfinput_grid %>%
-                                        dplyr::select(-orig_lon))%>%
+    rf_matched_grids <- grid_matching(finer_grid = rfinput_grid%>%
+                                        dplyr::select(-orig_lon),
+                                      coarser_grid = rfcrop_grid )%>%
       dplyr::rename(crop_lon = lon, crop_lat = lat,
                     clim_lon = coarse_lon, clim_lat = coarse_lat)
 
@@ -711,6 +544,7 @@ grid_to_basin_yield <- function(carbon = NULL,
       ir_inputs
 
     rf_tp %>%
+      tidyr::drop_na() %>%
       # TODO: update this with your specific info for nitrogen and CO2 in
       #       your scenario:
       dplyr::mutate(N=N) %>%
@@ -722,6 +556,14 @@ grid_to_basin_yield <- function(carbon = NULL,
                     lon = dplyr::if_else(lon > 179.75, lon -360, lon)) ->
       rf_inputs
 
+    # Filter the crop parameters to only include grid cells for which we have climate data,
+    # since we only want to estimate yield in the grid cells where we have the growing season
+    # info. This will also speed up the code.
+    ir_params_filtered <- dplyr::left_join(irinput_grid, ir_params, by = c("lat", "lon")) %>%
+      dplyr::select(-"orig_lon")
+
+    rf_params_filtered <- dplyr::left_join(rfinput_grid, rf_params, by = c("lat", "lon")) %>%
+      dplyr::select(-"orig_lon")
 
     # Test the inputs
     # rf_inputs %>%
@@ -739,13 +581,13 @@ grid_to_basin_yield <- function(carbon = NULL,
     # test_yields <- eval_yield(inputs=test_inputs, params=rf_params, matched_grids = rf_matched_grids)
 
 
-    ir_yields <- eval_yield(inputs=ir_inputs, params=ir_params, matched_grids = ir_matched_grids, irrig=T) %>%
+    ir_yields <- eval_yield(inputs=ir_inputs, params=ir_params_filtered, matched_grids = ir_matched_grids, irrig=T) %>%
       dplyr::mutate(gcm = esm_name,
                     cropmodel = cm_name) %>%
       dplyr::rename(lon = crop_lon,
                     lat = crop_lat)
 
-    rf_yields <- eval_yield(inputs=rf_inputs, params=rf_params, matched_grids = rf_matched_grids, irrig=F) %>%
+    rf_yields <- eval_yield(inputs=rf_inputs, params=rf_params_filtered, matched_grids = rf_matched_grids, irrig=F) %>%
       dplyr::mutate(gcm = esm_name,
                     cropmodel = cm_name) %>%
       dplyr::rename(lon = crop_lon,

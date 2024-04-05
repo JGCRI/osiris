@@ -6,9 +6,9 @@
 #' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
 #' @param esm_name Default = NULL
 #' @param scn_name Default = NULL
-#' @param crops Default = c("Corn", "Wheat", "Rice", "Soy")
+#' @param crops Default = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy")
 #' @param irrigation_rainfed Default = c("IRR", "RFD")
-#' @param minlat Default = -87.8638
+#' @param minlat Default = -89.75
 #' @param minlon Default = -179.75
 #' @param monthly_growing_season Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,	gslength, areamask
 #' @param monthly_harvest_season Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,	hmonth, areamask
@@ -35,12 +35,11 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
                                           write_dir = "outputs_calculate_delta_from_climate",
                                           esm_name = NULL,
                                           scn_name = NULL,
-                                          crops = c("Corn", "Wheat", "Rice", "Soy"),
+                                          crops = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy"),
                                           irrigation_rainfed = c("IRR", "RFD"),
-                                          minlat = -87.8638,
+                                          minlat = -89.75,
                                           minlon = -179.75,
                                           monthly_growing_season = NULL,
-                                          monthly_harvest_season = NULL,
                                           rollingAvgYears = 15,
                                           growing_season_dir = NULL,
                                           tas_historical = NULL,
@@ -75,9 +74,9 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   # Check that the crops in the input argument are valid
   crops <- stringi::stri_trans_totitle(crops)
   crops <- unique(crops)
-  if(!all(crops %in% c("Corn", "Wheat", "Rice", "Soy"))) {
+  if(!all(crops %in% c("Corn", "Spring Wheat", "Winter Wheat", "Rice", "Soy"))) {
     stop("The crops that were defined are either misspelled or not included in this package.
-         The crops currently included are: Corn, Wheat, Rice, Soy")
+         The crops currently included are: Corn, Spring Wheat, Winter Wheat, Rice, Soy")
   }
 
   #.........................
@@ -139,15 +138,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   ##TODO you'll need to track down the actual ggcmi phase 2 growing season masks,
   ##     these are just ones I had.
   # read in table of planting and harvesting months for each grid cell by crop, irr
-  ag_practice_info <-
-    data.table::fread(monthly_harvest_season) %>%
-    tibble::as_tibble() %>%
-    dplyr::left_join(
-      data.table::fread(monthly_growing_season) %>%
-        tibble::as_tibble() %>%
-        dplyr::select(-areamask),
-      by = c("latgrid", "longrid","crop", "irr", "pmonth")
-    )
+  ag_practice_info <- data.table::fread(monthly_growing_season)
 
 
   #.........................
@@ -171,7 +162,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
     # load these files in memory
 
-    # The historical file so we have 1980-2010 baseline years
+    # The historical file so we have 1980-2014 baseline years
     ncfile1 <- ncdf4::nc_open(batch0[1])
     # pull off lon/lat/time info
     lat1 <- ncdf4::ncvar_get(ncfile1,"lat")
@@ -224,7 +215,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
     x_comb_merge <- data.table::rbindlist(x_comb_list) %>%
       dplyr::mutate(year = as.integer(year),
                     month=as.integer(month)) %>%
-      dplyr::filter(year >= 1965)
+      dplyr::filter(year >= historical_start_year)
 
     rm(x_comb_list)
 
@@ -250,8 +241,10 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   # Smooth T and P growing season average values so that we have the long term
   # growing season average values
   #
-  # Then, calculate changes relative to 1980-2010 so that the deltas we have
+  # Then, calculate changes relative to 1980-2014 so that the deltas we have
   # are changes in long term growing season average values relative to baseline.
+  # Here we choose 1980-2014 since this overlaps the historical period from the
+  # ACCESS climate date for rest-of-the-world.
   #
   # Pretty sure the order doesn't matter for deltaT because it's additive but
   # deltaP is multiplicative so it does matter
@@ -312,7 +305,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       # baseline averages
       tas2 %>%
         dplyr::filter(year >= 1980,
-               year <= 2010) %>%
+               year <= 2014) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(baseTemp = mean(value)) %>%
         dplyr::ungroup() ->
@@ -320,7 +313,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
       pr2 %>%
         dplyr::filter(year >= 1980,
-               year <= 2010) %>%
+               year <= 2014) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(basePr = mean(value)) %>%
         dplyr::ungroup() ->

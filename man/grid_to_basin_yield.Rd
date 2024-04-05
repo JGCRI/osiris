@@ -14,11 +14,10 @@ grid_to_basin_yield(
   basin_id = NULL,
   region_id = NULL,
   write_dir = "outputs_grid_to_basin_yield",
-  wheat_area = NULL,
-  crops = c("maize", "rice", "soy", "wheat"),
+  crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
   esm_name = "WRF",
   cm_name = "LPJmL",
-  scn_name = "rcp8p5_hot",
+  scn_name = "rcp8p5_hotter",
   N = 200
 )
 }
@@ -41,15 +40,13 @@ grid_to_basin_yield(
 
 \item{write_dir}{Default = "outputs_grid_to_basin_yield". Output Folder}
 
-\item{wheat_area}{Default = NULL Spring and winter wheat areas}
-
-\item{crops}{Default = c("maize", "rice", "soy", "wheat")}
+\item{crops}{Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")}
 
 \item{esm_name}{Default = 'WRF'}
 
 \item{cm_name}{Default = 'LPJmL'}
 
-\item{scn_name}{Default = 'rcp8p5_hot'}
+\item{scn_name}{Default = 'rcp8p5_hotter'}
 
 \item{N}{Default = 200. Assuming nothing is nitrogen limited and apply across grids}
 }

@@ -9,12 +9,11 @@ calculate_deltas_from_climate(
   write_dir = "outputs_calculate_delta_from_climate",
   esm_name = NULL,
   scn_name = NULL,
-  crops = c("Corn", "Wheat", "Rice", "Soy"),
+  crops = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy"),
   irrigation_rainfed = c("IRR", "RFD"),
-  minlat = -87.8638,
+  minlat = -89.75,
   minlon = -179.75,
   monthly_growing_season = NULL,
-  monthly_harvest_season = NULL,
   rollingAvgYears = 15,
   growing_season_dir = NULL,
   tas_historical = NULL,
@@ -34,17 +33,15 @@ calculate_deltas_from_climate(
 
 \item{scn_name}{Default = NULL}
 
-\item{crops}{Default = c("Corn", "Wheat", "Rice", "Soy")}
+\item{crops}{Default = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy")}
 
 \item{irrigation_rainfed}{Default = c("IRR", "RFD")}
 
-\item{minlat}{Default = -87.8638}
+\item{minlat}{Default = -89.75}
 
 \item{minlon}{Default = -179.75}
 
 \item{monthly_growing_season}{Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    gslength, areamask}
-
-\item{monthly_harvest_season}{Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask}
 
 \item{rollingAvgYears}{Default = 15}
 
@@ -61,6 +58,8 @@ calculate_deltas_from_climate(
 \item{historical_start_year}{= NULL. Start year of historical data.}
 
 \item{projection_start_year}{= NULL. Start year of projection data.}
+
+\item{monthly_harvest_season}{Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask}
 }
 \value{
 number
