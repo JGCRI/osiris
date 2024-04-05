@@ -96,12 +96,11 @@
 <span>  write_dir <span class="op">=</span> <span class="st">"outputs_calculate_delta_from_climate"</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scn_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Spring wheat"</span>, <span class="st">"Winter wheat"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span><span class="op">)</span>,</span>
 <span>  irrigation_rainfed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"IRR"</span>, <span class="st">"RFD"</span><span class="op">)</span>,</span>
-<span>  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">87.8638</span>,</span>
+<span>  minlat <span class="op">=</span> <span class="op">-</span><span class="fl">89.75</span>,</span>
 <span>  minlon <span class="op">=</span> <span class="op">-</span><span class="fl">179.75</span>,</span>
 <span>  monthly_growing_season <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  monthly_harvest_season <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  rollingAvgYears <span class="op">=</span> <span class="fl">15</span>,</span>
 <span>  growing_season_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tas_historical <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -132,7 +131,7 @@
 
 
 <dt>crops</dt>
-<dd><p>Default = c("Corn", "Wheat", "Rice", "Soy")</p></dd>
+<dd><p>Default = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy")</p></dd>
 
 
 <dt>irrigation_rainfed</dt>
@@ -140,7 +139,7 @@
 
 
 <dt>minlat</dt>
-<dd><p>Default = -87.8638</p></dd>
+<dd><p>Default = -89.75</p></dd>
 
 
 <dt>minlon</dt>
@@ -149,10 +148,6 @@
 
 <dt>monthly_growing_season</dt>
 <dd><p>Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    gslength, areamask</p></dd>
-
-
-<dt>monthly_harvest_season</dt>
-<dd><p>Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask</p></dd>
 
 
 <dt>rollingAvgYears</dt>
@@ -185,6 +180,10 @@
 
 <dt>projection_start_year</dt>
 <dd><p>= NULL. Start year of projection data.</p></dd>
+
+
+<dt>monthly_harvest_season</dt>
+<dd><p>Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask</p></dd>
 
 </dl></div>
     <div id="value">

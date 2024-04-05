@@ -103,11 +103,10 @@ gcam basin level via MIRCA harvested areas.</p>
 <span>  basin_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  region_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  write_dir <span class="op">=</span> <span class="st">"outputs_grid_to_basin_yield"</span>,</span>
-<span>  wheat_area <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"wheat"</span><span class="op">)</span>,</span>
+<span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"maize"</span>, <span class="st">"rice"</span>, <span class="st">"soy"</span>, <span class="st">"spring wheat"</span>, <span class="st">"winter wheat"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">"WRF"</span>,</span>
 <span>  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,</span>
-<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5_hot"</span>,</span>
+<span>  scn_name <span class="op">=</span> <span class="st">"rcp8p5_hotter"</span>,</span>
 <span>  N <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -150,12 +149,8 @@ gcam basin level via MIRCA harvested areas.</p>
 <dd><p>Default = "outputs_grid_to_basin_yield". Output Folder</p></dd>
 
 
-<dt>wheat_area</dt>
-<dd><p>Default = NULL Spring and winter wheat areas</p></dd>
-
-
 <dt>crops</dt>
-<dd><p>Default = c("maize", "rice", "soy", "wheat")</p></dd>
+<dd><p>Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")</p></dd>
 
 
 <dt>esm_name</dt>
@@ -167,7 +162,7 @@ gcam basin level via MIRCA harvested areas.</p>
 
 
 <dt>scn_name</dt>
-<dd><p>Default = 'rcp8p5_hot'</p></dd>
+<dd><p>Default = 'rcp8p5_hotter'</p></dd>
 
 
 <dt>N</dt>
