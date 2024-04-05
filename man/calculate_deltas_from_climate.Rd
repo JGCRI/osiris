@@ -58,8 +58,6 @@ calculate_deltas_from_climate(
 \item{historical_start_year}{= NULL. Start year of historical data.}
 
 \item{projection_start_year}{= NULL. Start year of projection data.}
-
-\item{monthly_harvest_season}{Default = NULL. A csv file with columns latgrid, longrid, crop, irr, pmonth,    hmonth, areamask}
 }
 \value{
 number
