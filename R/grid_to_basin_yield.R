@@ -11,7 +11,8 @@
 #' @param basin_grid Default = NULL
 #' @param basin_id Default = NULL
 #' @param region_id Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter
-#' @param write_dir Default = "outputs_grid_to_basin_yield". Output Folder
+#' @param gridded_yield_dir Default = NULL.
+#' @param write_dir Default = "step2_grid_to_basin_yield". Output Folder
 #' @param crops Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")
 #' @param esm_name Default = 'WRF'
 #' @param cm_name Default = 'LPJmL'
@@ -36,7 +37,8 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 basin_grid = NULL,
                                 basin_id = NULL,
                                 region_id = NULL,
-                                write_dir = "outputs_grid_to_basin_yield",
+                                gridded_yield_dir = NULL,
+                                write_dir = "step2_grid_to_basin_yield",
                                 crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
                                 esm_name = 'WRF',
                                 cm_name = 'LPJmL',
@@ -53,6 +55,9 @@ grid_to_basin_yield <- function(carbon = NULL,
 
   # Check write dir
   if(!dir.exists(write_dir)){dir.create(write_dir)}
+
+  # Make a directory for gridded_yield if not there
+  if(!dir.exists(gridded_yield_dir)){dir.create(gridded_yield_dir)}
 
   # Initialize values
   NULL -> year -> value -> vtag -> units -> ctag -> type -> Scenario ->
@@ -81,7 +86,6 @@ grid_to_basin_yield <- function(carbon = NULL,
     if(rule == 1 | rule == 2 ) {
       tryCatch(stats::approx(as.vector(year), value, rule = rule, xout = year)$y,
                error=function(e) NA)
-
     } else {
       stop("Not implemented yet!")
     }
@@ -151,9 +155,7 @@ grid_to_basin_yield <- function(carbon = NULL,
   }
 
 
-  ## TODO: double check that the inputs are formed correctly
-  ##       for what the paper Franke et al needs.
-  # This is not fast, it's evaluating a polynomial at every grid
+  # This may take a while since it's evaluating a polynomial at every grid
   # point in every year
   eval_yield <- function(inputs, params, matched_grids, irrig=F){
 
@@ -262,7 +264,7 @@ grid_to_basin_yield <- function(carbon = NULL,
     }
     row.names(yields) <- NULL
     return(yields %>%
-             dplyr::select(crop, irr, crop_lon, crop_lat, year, yield))
+             dplyr::select(crop, irr, crop_lon, crop_lat, year, yield, deltaT, deltaP))
   }
 
 
@@ -280,8 +282,6 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     if(unique(halfdeg_yield$crop) == 'Corn'){
       area_crop_name <- 'maize'
-    }else if(unique(halfdeg_yield$crop) %in% c('Spring Wheat', 'Winter Wheat')){
-      area_crop_name <- 'wheat'
     }else{
       area_crop_name <- tolower(unique(halfdeg_yield$crop))
     }
@@ -414,45 +414,45 @@ grid_to_basin_yield <- function(carbon = NULL,
 
   for(crop in crops){
 
-    rlang::inform(paste0("Generating basin yield for ", crop))
+    rlang::inform(paste0("Generating gridded yield for ", crop))
 
     # yield emu netcdf
     ncfname <- emulatorlist[grepl(sub(" ", "_", crop), emulatorlist) & grepl(cm_name, emulatorlist)]
 
-      # get emulation parameters.
-      ncin <- ncdf4::nc_open(ncfname)
+    # get emulation parameters.
+    ncin <- ncdf4::nc_open(ncfname)
 
-      nc_lon <- ncdf4::ncvar_get(ncin,'lon')
-      nc_lat <- ncdf4::ncvar_get(ncin, 'lat')
-      grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
+    nc_lon <- ncdf4::ncvar_get(ncin,'lon')
+    nc_lat <- ncdf4::ncvar_get(ncin, 'lat')
+    grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
 
-      # pull and reshape rainfed params
-      rf_params_3d_array <- ncdf4::ncvar_get(ncin, 'K_rf')
-      indlon <- which(dim(rf_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(rf_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(rf_params_3d_array)==ncin$dim$poly$len)
+    # pull and reshape rainfed params
+    rf_params_3d_array <- ncdf4::ncvar_get(ncin, 'K_rf')
+    indlon <- which(dim(rf_params_3d_array)==length(nc_lon))
+    indlat <- which(dim(rf_params_3d_array)==length(nc_lat))
+    indpoly <- which(dim(rf_params_3d_array)==ncin$dim$poly$len)
 
-      rf_params <-cbind(grid,
-                        t(rbind(matrix(aperm(rf_params_3d_array, c(indpoly,indlon,indlat)),
-                                       ncin$dim$poly$len,length(nc_lat)*length(nc_lon))
-                        ))
-      )
-      rm(rf_params_3d_array)
+    rf_params <-cbind(grid,
+                      t(rbind(matrix(aperm(rf_params_3d_array, c(indpoly,indlon,indlat)),
+                                     ncin$dim$poly$len,length(nc_lat)*length(nc_lon))
+                      ))
+    )
+    rm(rf_params_3d_array)
 
 
-      # pull and reshape irrigated params
-      ir_params_3d_array <- ncdf4::ncvar_get(ncin, 'K_ir')
-      indlon <- which(dim(ir_params_3d_array)==length(nc_lon))
-      indlat <- which(dim(ir_params_3d_array)==length(nc_lat))
-      indpoly <- which(dim(ir_params_3d_array)==ncin$dim$poly$len)
+    # pull and reshape irrigated params
+    ir_params_3d_array <- ncdf4::ncvar_get(ncin, 'K_ir')
+    indlon <- which(dim(ir_params_3d_array)==length(nc_lon))
+    indlat <- which(dim(ir_params_3d_array)==length(nc_lat))
+    indpoly <- which(dim(ir_params_3d_array)==ncin$dim$poly$len)
 
-      ir_params <-cbind(grid,
-                        t(rbind(matrix(aperm(ir_params_3d_array, c(indpoly,indlon,indlat)),
-                                       ncin$dim$poly$len,length(nc_lat)*length(nc_lon))
-                        ))
-      )
-      rm(ir_params_3d_array)
-      ncdf4::nc_close(ncin)
+    ir_params <-cbind(grid,
+                      t(rbind(matrix(aperm(ir_params_3d_array, c(indpoly,indlon,indlat)),
+                                     ncin$dim$poly$len,length(nc_lat)*length(nc_lon))
+                      ))
+    )
+    rm(ir_params_3d_array)
+    ncdf4::nc_close(ncin)
 
     # The crop responses include every grid cells, even ones with 0 response.
     # Drop the cells with 0 response to speed things up.
@@ -593,14 +593,118 @@ grid_to_basin_yield <- function(carbon = NULL,
       dplyr::rename(lon = crop_lon,
                     lat = crop_lat)
 
-
     # Replace negative yields with zero
     ir_yields$yield[ir_yields$yield < 0] <- 0
     rf_yields$yield[rf_yields$yield < 0] <- 0
 
-    # So now we have a data frame of yields for each grid cell in each year
-    # for the grid cells from the finest mesh.
-    # In this case, that's the crop grid cells.
+    # Save gridded yield data (as well as deltaT and delatP) by crop and irr
+    ir_yields  %>%
+      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_irr_gridded_yield_deltaT_deltaP.csv'),
+                       row.names = F)
+
+    rf_yields  %>%
+      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_rfd_gridded_yield.csv'),
+                       row.names = F)
+  }
+
+
+  # So now we have a data frame of yields for each grid cell in each year, which
+  # we load from file. This helps to deal with the spring and winter wheat aggregation.
+  # We deal with wheat separately first. Then the rest of the crops are done in a loop.
+
+  crop <- "wheat"
+  rlang::inform(paste0("Generating basin yield for ", crop))
+
+  griddedlist <- list.files(path=gridded_yield_dir, pattern = paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
+
+  # Read in spring and winter wheat gridded yield outputs
+  ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
+    dplyr::select(-c(deltaT, deltaP)) %>%
+    dplyr:: rename(swheat_yield = yield)
+  rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+    dplyr::select(-c(deltaT, deltaP)) %>%
+    dplyr:: rename(swheat_yield = yield)
+
+  ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
+    dplyr::select(-c(deltaT, deltaP)) %>%
+    dplyr:: rename(wwheat_yield = yield)
+  rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+    dplyr::select(-c(deltaT, deltaP)) %>%
+    dplyr:: rename(wwheat_yield = yield)
+
+
+  # Function for adding rows with NA (we want to keep NA if summing two NA, otherwise
+  # summing two NA will yield 0)
+  sum_na <- function(x) {
+    if(all(is.na(x))) NA else sum(x, na.rm = TRUE)
+  }
+
+  ir_yield_wheat <- dplyr::left_join(ir_yield_swheat,
+                                     ir_yield_wwheat,
+                                     by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
+
+
+  rf_yield_wheat <- dplyr::left_join(rf_yield_swheat,
+                                     rf_yield_wwheat,
+                                     by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
+
+
+  ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat)
+  rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat)
+
+  dplyr::bind_rows(rf_yields_basin,
+                   ir_yields_basin) ->
+    yield.basin
+
+  years <- min(yield.basin$year):max(yield.basin$year)
+
+  # note that only 231 basins have data
+  # we need to create new rows in the data frame for missing basins
+  # (otherwise gcammapdata::plot_GCAM() will fail)
+
+  tibble::tibble(id = which(basinIDs$GCAM_basin_ID %in% yield.basin$id == F)) %>%
+    dplyr::mutate(year = years[1]) %>%
+    tidyr::complete(id, year = years) %>%
+    dplyr::mutate(yield = 0,
+                  HA = 0,
+                  cropmodel = cm_name,
+                  gcm = esm_name,
+                  rcp = scn_name,
+                  crop = crop) ->
+    tmp
+
+  dplyr::bind_rows(tmp %>% dplyr::mutate(irr = 'IRR'),
+                   tmp %>% dplyr::mutate(irr = 'RFD')) ->
+    mb
+  rm(tmp)
+
+  # bind the missing basins
+  dplyr::bind_rows(yield.basin, mb) %>%
+    dplyr::ungroup() ->
+    yieldByBasin
+
+
+  utils::write.csv(yieldByBasin, paste0(write_dir, "/", cm_name, "_",
+                                        esm_name, "_", scn_name, "_", crop, "_",
+                                        min(years), "_", max(years),".csv"),
+                   row.names = F)
+
+
+# Run basin yield aggregation for remaining crops (not including wheat)
+  for(crop in crops[!grepl("wheat", crops)]){
+
+    rlang::inform(paste0("Generating basin yield for ", crop))
+
+# Read in gridded yield outputs by crop
+    ir_yields <- utils::read.csv(griddedlist[grepl(crop, griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
+      dplyr::select(-c(deltaT, deltaP))
+    rf_yields <- utils::read.csv(griddedlist[grepl(crop, griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+      dplyr::select(-c(deltaT, deltaP))
+
 
     ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yields)
     rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yields)
@@ -643,6 +747,5 @@ grid_to_basin_yield <- function(carbon = NULL,
                      row.names = F)
 
   }
-
   rlang::inform("grid_to_basin_yield complete.")
 }

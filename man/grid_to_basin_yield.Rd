@@ -13,7 +13,8 @@ grid_to_basin_yield(
   basin_grid = NULL,
   basin_id = NULL,
   region_id = NULL,
-  write_dir = "outputs_grid_to_basin_yield",
+  gridded_yield_dir = NULL,
+  write_dir = "step2_grid_to_basin_yield",
   crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
   esm_name = "WRF",
   cm_name = "LPJmL",
@@ -38,7 +39,9 @@ grid_to_basin_yield(
 
 \item{region_id}{Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter}
 
-\item{write_dir}{Default = "outputs_grid_to_basin_yield". Output Folder}
+\item{gridded_yield_dir}{Default = NULL.}
+
+\item{write_dir}{Default = "step2_grid_to_basin_yield". Output Folder}
 
 \item{crops}{Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")}
 

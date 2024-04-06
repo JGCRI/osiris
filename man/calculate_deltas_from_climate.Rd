@@ -6,7 +6,7 @@
 \usage{
 calculate_deltas_from_climate(
   climate_dir = NULL,
-  write_dir = "outputs_calculate_delta_from_climate",
+  write_dir = "step1_calculate_delta_from_climate",
   esm_name = NULL,
   scn_name = NULL,
   crops = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy"),
@@ -27,7 +27,7 @@ calculate_deltas_from_climate(
 \arguments{
 \item{climate_dir}{Default = NULL}
 
-\item{write_dir}{Default = "outputs_calculate_delta_from_climate". Output Folder}
+\item{write_dir}{Default = "step1_calculate_delta_from_climate". Output Folder}
 
 \item{esm_name}{Default = NULL}
 

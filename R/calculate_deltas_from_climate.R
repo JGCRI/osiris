@@ -3,7 +3,7 @@
 #' Function to process climate data to calculate delta P and delta T.
 #'
 #' @param climate_dir Default = NULL
-#' @param write_dir Default = "outputs_calculate_delta_from_climate". Output Folder
+#' @param write_dir Default = "step1_calculate_delta_from_climate". Output Folder
 #' @param esm_name Default = NULL
 #' @param scn_name Default = NULL
 #' @param crops Default = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy")
@@ -31,7 +31,7 @@
 #' }
 
 calculate_deltas_from_climate <- function(climate_dir = NULL,
-                                          write_dir = "outputs_calculate_delta_from_climate",
+                                          write_dir = "step1_calculate_delta_from_climate",
                                           esm_name = NULL,
                                           scn_name = NULL,
                                           crops = c("Corn", "Spring wheat", "Winter wheat", "Rice", "Soy"),
