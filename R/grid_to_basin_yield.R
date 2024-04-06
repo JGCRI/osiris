@@ -612,86 +612,90 @@ grid_to_basin_yield <- function(carbon = NULL,
   # we load from file. This helps to deal with the spring and winter wheat aggregation.
   # We deal with wheat separately first. Then the rest of the crops are done in a loop.
 
-  crop <- "wheat"
-  rlang::inform(paste0("Generating basin yield for ", crop))
+  if (any(grepl("wheat", crops))) {
 
-  griddedlist <- list.files(path=gridded_yield_dir, pattern = paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
+    crop <- "wheat"
+    rlang::inform(paste0("Generating basin yield for ", crop))
 
-  # Read in spring and winter wheat gridded yield outputs
-  ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
-    dplyr::select(-c(deltaT, deltaP)) %>%
-    dplyr:: rename(swheat_yield = yield)
-  rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
-    dplyr::select(-c(deltaT, deltaP)) %>%
-    dplyr:: rename(swheat_yield = yield)
+    griddedlist <- list.files(path=gridded_yield_dir, pattern = paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
 
-  ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
-    dplyr::select(-c(deltaT, deltaP)) %>%
-    dplyr:: rename(wwheat_yield = yield)
-  rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
-    dplyr::select(-c(deltaT, deltaP)) %>%
-    dplyr:: rename(wwheat_yield = yield)
+    # Read in spring and winter wheat gridded yield outputs
+    ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
+      dplyr::select(-c(deltaT, deltaP)) %>%
+      dplyr:: rename(swheat_yield = yield)
+    rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+      dplyr::select(-c(deltaT, deltaP)) %>%
+      dplyr:: rename(swheat_yield = yield)
+
+    ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
+      dplyr::select(-c(deltaT, deltaP)) %>%
+      dplyr:: rename(wwheat_yield = yield)
+    rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+      dplyr::select(-c(deltaT, deltaP)) %>%
+      dplyr:: rename(wwheat_yield = yield)
 
 
-  # Function for adding rows with NA (we want to keep NA if summing two NA, otherwise
-  # summing two NA will yield 0)
-  sum_na <- function(x) {
-    if(all(is.na(x))) NA else sum(x, na.rm = TRUE)
+    # Function for adding rows with NA (we want to keep NA if summing two NA, otherwise
+    # summing two NA will yield 0)
+    sum_na <- function(x) {
+      if(all(is.na(x))) NA else sum(x, na.rm = TRUE)
+    }
+
+    ir_yield_wheat <- dplyr::left_join(ir_yield_swheat,
+                                       ir_yield_wwheat,
+                                       by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
+
+
+    rf_yield_wheat <- dplyr::left_join(rf_yield_swheat,
+                                       rf_yield_wwheat,
+                                       by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      dplyr::rowwise() %>%
+      dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
+
+
+    ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat)
+    rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat)
+
+    dplyr::bind_rows(rf_yields_basin,
+                     ir_yields_basin) ->
+      yield.basin
+
+    years <- min(yield.basin$year):max(yield.basin$year)
+
+    # note that only 231 basins have data
+    # we need to create new rows in the data frame for missing basins
+    # (otherwise gcammapdata::plot_GCAM() will fail)
+
+    tibble::tibble(id = which(basinIDs$GCAM_basin_ID %in% yield.basin$id == F)) %>%
+      dplyr::mutate(year = years[1]) %>%
+      tidyr::complete(id, year = years) %>%
+      dplyr::mutate(yield = 0,
+                    HA = 0,
+                    cropmodel = cm_name,
+                    gcm = esm_name,
+                    rcp = scn_name,
+                    crop = crop) ->
+      tmp
+
+    dplyr::bind_rows(tmp %>% dplyr::mutate(irr = 'IRR'),
+                     tmp %>% dplyr::mutate(irr = 'RFD')) ->
+      mb
+    rm(tmp)
+
+    # bind the missing basins
+    dplyr::bind_rows(yield.basin, mb) %>%
+      dplyr::ungroup() ->
+      yieldByBasin
+
+
+    utils::write.csv(yieldByBasin, paste0(write_dir, "/", cm_name, "_",
+                                          esm_name, "_", scn_name, "_", crop, "_",
+                                          min(years), "_", max(years),".csv"),
+                     row.names = F)
+
   }
-
-  ir_yield_wheat <- dplyr::left_join(ir_yield_swheat,
-                                     ir_yield_wwheat,
-                                     by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
-
-
-  rf_yield_wheat <- dplyr::left_join(rf_yield_swheat,
-                                     rf_yield_wwheat,
-                                     by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
-
-
-  ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat)
-  rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat)
-
-  dplyr::bind_rows(rf_yields_basin,
-                   ir_yields_basin) ->
-    yield.basin
-
-  years <- min(yield.basin$year):max(yield.basin$year)
-
-  # note that only 231 basins have data
-  # we need to create new rows in the data frame for missing basins
-  # (otherwise gcammapdata::plot_GCAM() will fail)
-
-  tibble::tibble(id = which(basinIDs$GCAM_basin_ID %in% yield.basin$id == F)) %>%
-    dplyr::mutate(year = years[1]) %>%
-    tidyr::complete(id, year = years) %>%
-    dplyr::mutate(yield = 0,
-                  HA = 0,
-                  cropmodel = cm_name,
-                  gcm = esm_name,
-                  rcp = scn_name,
-                  crop = crop) ->
-    tmp
-
-  dplyr::bind_rows(tmp %>% dplyr::mutate(irr = 'IRR'),
-                   tmp %>% dplyr::mutate(irr = 'RFD')) ->
-    mb
-  rm(tmp)
-
-  # bind the missing basins
-  dplyr::bind_rows(yield.basin, mb) %>%
-    dplyr::ungroup() ->
-    yieldByBasin
-
-
-  utils::write.csv(yieldByBasin, paste0(write_dir, "/", cm_name, "_",
-                                        esm_name, "_", scn_name, "_", crop, "_",
-                                        min(years), "_", max(years),".csv"),
-                   row.names = F)
 
 
 # Run basin yield aggregation for remaining crops (not including wheat)
