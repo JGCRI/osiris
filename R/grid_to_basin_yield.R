@@ -416,7 +416,11 @@ grid_to_basin_yield <- function(carbon = NULL,
     rlang::inform(paste0("Generating gridded yield for ", crop))
 
     # yield emu netcdf
-    ncfname <- emulatorlist[grepl(sub(" ", "_", crop), emulatorlist) & grepl(cm_name, emulatorlist)]
+    if(crop == "Corn"){
+      ncfname <- emulatorlist[grepl("maize", emulatorlist) & grepl(cm_name, emulatorlist)]
+    }else{
+      ncfname <- emulatorlist[grepl(sub(" ", "_", tolower(crop)), emulatorlist) & grepl(cm_name, emulatorlist)]
+    }
 
     # get emulation parameters.
     ncin <- ncdf4::nc_open(ncfname)
