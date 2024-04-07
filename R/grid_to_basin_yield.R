@@ -603,7 +603,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                        row.names = F)
 
     rf_yields  %>%
-      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_rfd_gridded_yield.csv'),
+      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_rfd_gridded_yield_deltaT_deltaP.csv'),
                        row.names = F)
   }
 
@@ -655,7 +655,7 @@ grid_to_basin_yield <- function(carbon = NULL,
       dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
 
     # Check that ir and rf summed correctly
-    if(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield) == sum(ir_yield_wheat$yield)) {
+    if(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE) == sum(ir_yield_wheat$yield, na.rm = TRUE)) {
       rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield")
     } else{rlang::inform("Error: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield")}
 
