@@ -13,7 +13,7 @@
 #' @param region_id Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter
 #' @param gridded_yield_dir Default = NULL.
 #' @param write_dir Default = "step2_grid_to_basin_yield". Output Folder
-#' @param crops Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")
+#' @param crops Default = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat")
 #' @param esm_name Default = 'WRF'
 #' @param cm_name Default = 'LPJmL'
 #' @param scn_name Default = 'rcp8p5_hotter'
@@ -39,7 +39,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 region_id = NULL,
                                 gridded_yield_dir = NULL,
                                 write_dir = "step2_grid_to_basin_yield",
-                                crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
+                                crops = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat"),
                                 esm_name = 'WRF',
                                 cm_name = 'LPJmL',
                                 scn_name = 'rcp8p5_hotter',
@@ -95,10 +95,10 @@ grid_to_basin_yield <- function(carbon = NULL,
   # This matches yield data to harvested area data
   # ... both of which come in different files.
   match_crop <- function(CROP){
-    croplist <- c("crop01" = "wheat",
-                  "crop02" = "maize",
-                  "crop03" = "rice",
-                  "crop08" = "soy",
+    croplist <- c("crop01" = "Wheat",
+                  "crop02" = "Corn",
+                  "crop03" = "Rice",
+                  "crop08" = "Soy",
                   "crop11" = "cas",
                   "crop25" = "mgr",
                   "crop06" = "mil",
@@ -280,10 +280,10 @@ grid_to_basin_yield <- function(carbon = NULL,
   ##      Then you'll do the aggregation with MIRCA harvested area data below:
   aggregate_halfdeg_yield2basin <- function(halfdeg_yield){
 
-    if(unique(halfdeg_yield$crop) == 'Corn'){
-      area_crop_name <- 'maize'
+    if(unique(halfdeg_yield$crop) %in% c('Spring Wheat', 'Winter Wheat')){
+      area_crop_name <- 'Wheat'
     }else{
-      area_crop_name <- tolower(unique(halfdeg_yield$crop))
+      area_crop_name <- unique(halfdeg_yield$crop)
     }
 
     if(unique(halfdeg_yield$irr) == 'IRR'){
@@ -472,14 +472,8 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     # read in climate data
-    if(crop == 'maize'){
-      rf_tp <- utils::read.csv(inputlist[grepl('corn', inputlist) & grepl('rfd', inputlist)], stringsAsFactors = F)
-      ir_tp <- utils::read.csv(inputlist[grepl('corn', inputlist) & grepl('irr', inputlist)], stringsAsFactors = F)
-    }else{
-      rf_tp <- utils::read.csv(inputlist[grepl(crop, inputlist) & grepl('rfd', inputlist)], stringsAsFactors = F)
-      ir_tp <- utils::read.csv(inputlist[grepl(crop, inputlist) & grepl('irr', inputlist)], stringsAsFactors = F)
-    }
-
+    rf_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('rfd', inputlist)], stringsAsFactors = F)
+    ir_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('irr', inputlist)], stringsAsFactors = F)
 
     # Combine C, N, T and P data with ir and rfd params to get ir, rf yields in each
     # grid cell in each year
@@ -599,11 +593,11 @@ grid_to_basin_yield <- function(carbon = NULL,
 
     # Save gridded yield data (as well as deltaT and delatP) by crop and irr
     ir_yields  %>%
-      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_irr_gridded_yield_deltaT_deltaP.csv'),
+      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', tolower(crop), '_irr_gridded_yield_deltaT_deltaP.csv'),
                        row.names = F)
 
     rf_yields  %>%
-      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', crop, '_rfd_gridded_yield_deltaT_deltaP.csv'),
+      utils::write.csv(., paste0(gridded_yield_dir, '/', cm_name, "_", esm_name, '_', scn_name,'_', tolower(crop), '_rfd_gridded_yield_deltaT_deltaP.csv'),
                        row.names = F)
   }
 
@@ -612,9 +606,9 @@ grid_to_basin_yield <- function(carbon = NULL,
   # we load from file. This helps to deal with the spring and winter wheat aggregation.
   # We deal with wheat separately first. Then the rest of the crops are done in a loop.
 
-  if (any(grepl("wheat", crops))) {
+  if (any(grepl("Wheat", crops))) {
 
-    crop <- "wheat"
+    crop <- "Wheat"
     rlang::inform(paste0("Generating basin yield for ", crop))
 
     griddedlist <- list.files(path=gridded_yield_dir, pattern = paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
@@ -622,17 +616,21 @@ grid_to_basin_yield <- function(carbon = NULL,
     # Read in spring and winter wheat gridded yield outputs
     ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr:: rename(swheat_yield = yield)
+      dplyr::rename(swheat_yield = yield) %>%
+      dplyr::mutate(crop = "Wheat")
     rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr:: rename(swheat_yield = yield)
+      dplyr::rename(swheat_yield = yield) %>%
+      dplyr::mutate(crop = "Wheat")
 
     ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr:: rename(wwheat_yield = yield)
+      dplyr::rename(wwheat_yield = yield) %>%
+      dplyr::mutate(crop = "Wheat")
     rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr:: rename(wwheat_yield = yield)
+      dplyr::rename(wwheat_yield = yield) %>%
+      dplyr::mutate(crop = "Wheat")
 
 
     # Function for adding rows with NA (we want to keep NA if summing two NA, otherwise
@@ -704,7 +702,7 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     utils::write.csv(yieldByBasin, paste0(write_dir, "/", cm_name, "_",
-                                          esm_name, "_", scn_name, "_", crop, "_",
+                                          esm_name, "_", scn_name, "_", tolower(crop), "_",
                                           min(years), "_", max(years),".csv"),
                      row.names = F)
 
@@ -712,14 +710,14 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
 # Run basin yield aggregation for remaining crops (not including wheat)
-  for(crop in crops[!grepl("wheat", crops)]){
+  for(crop in crops[!grepl("Wheat", crops)]){
 
     rlang::inform(paste0("Generating basin yield for ", crop))
 
 # Read in gridded yield outputs by crop
-    ir_yields <- utils::read.csv(griddedlist[grepl(crop, griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
+    ir_yields <- utils::read.csv(griddedlist[grepl(tolower(crop), griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
       dplyr::select(-c(deltaT, deltaP))
-    rf_yields <- utils::read.csv(griddedlist[grepl(crop, griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
+    rf_yields <- utils::read.csv(griddedlist[grepl(tolower(crop), griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP))
 
 
@@ -759,7 +757,7 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     utils::write.csv(yieldByBasin, paste0(write_dir, "/", cm_name, "_",
-                                          esm_name, "_", scn_name, "_", crop, "_",
+                                          esm_name, "_", scn_name, "_", tolower(crop), "_",
                                           min(years), "_", max(years),".csv"),
                      row.names = F)
 

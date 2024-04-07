@@ -15,7 +15,7 @@ grid_to_basin_yield(
   region_id = NULL,
   gridded_yield_dir = NULL,
   write_dir = "step2_grid_to_basin_yield",
-  crops = c("maize", "rice", "soy", "spring wheat", "winter wheat"),
+  crops = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat"),
   esm_name = "WRF",
   cm_name = "LPJmL",
   scn_name = "rcp8p5_hotter",
@@ -43,7 +43,7 @@ grid_to_basin_yield(
 
 \item{write_dir}{Default = "step2_grid_to_basin_yield". Output Folder}
 
-\item{crops}{Default = c("maize", "rice", "soy", "spring wheat", "winter wheat")}
+\item{crops}{Default = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat")}
 
 \item{esm_name}{Default = 'WRF'}
 
