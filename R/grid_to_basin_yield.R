@@ -71,11 +71,10 @@ grid_to_basin_yield <- function(carbon = NULL,
     wwh_rf -> .
 
   # Check that the crops in the input argument are valid
-  crops <- tolower(crops)
   crops <- unique(crops)
-  if(!all(crops %in% c("maize", "rice", "soy", "spring wheat", "winter wheat"))) {
+  if(!all(crops %in% c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat"))) {
     stop("The crops that were defined are either misspelled or not included in this package.
-         The crops currently included are: maize, rice, soy, wheat")
+         The crops currently included are: Corn, Rice, Soy, Spring Wheat, Winter Wheat")
   }
 
   #.........................
