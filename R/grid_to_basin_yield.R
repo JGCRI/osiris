@@ -654,19 +654,22 @@ grid_to_basin_yield <- function(carbon = NULL,
       dplyr::rowwise() %>%
       dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
 
+
     # Check that ir and rf summed correctly
     if(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE) == sum(ir_yield_wheat$yield, na.rm = TRUE)) {
       rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield")
     } else{rlang::inform("Error: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield")}
 
-    if(sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield) == sum(rf_yield_wheat$yield)) {
+    if(sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE) == sum(rf_yield_wheat$yield, na.rm = TRUE)) {
       rlang::inform("Sum of individual rainfed spring and winter wheat yields correctly sum to total rainfed wheat yield")
     } else{rlang::inform("Error: Sum of individual rainfed spring and winter wheat yields do not sum to total rainfed wheat yield")}
 
 
     # Generate basin yield
-    ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat)
-    rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat)
+    ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat %>%
+                                                        dplyr::select(-c(swheat_yield, wwheat_yield)))
+    rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat %>%
+                                                        dplyr::select(-c(swheat_yield, wwheat_yield)))
 
     dplyr::bind_rows(rf_yields_basin,
                      ir_yields_basin) ->
