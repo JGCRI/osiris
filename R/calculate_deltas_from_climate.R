@@ -157,7 +157,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
     # load these files in memory
 
-    # The historical file so we have 1980-2014 baseline years
+    # The historical file so we have 1980-2010 baseline years
     ncfile1 <- ncdf4::nc_open(batch0[1])
     # pull off lon/lat/time info
     lat1 <- ncdf4::ncvar_get(ncfile1,"lat")
@@ -236,9 +236,9 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
   # Smooth T and P growing season average values so that we have the long term
   # growing season average values
   #
-  # Then, calculate changes relative to 1980-2014 so that the deltas we have
+  # Then, calculate changes relative to 1980-2010 so that the deltas we have
   # are changes in long term growing season average values relative to baseline.
-  # Here we choose 1980-2014 since this overlaps the historical period from the
+  # Here we choose 1980-2010 since this overlaps the historical period from the
   # ACCESS climate date for rest-of-the-world.
   #
   # Pretty sure the order doesn't matter for deltaT because it's additive but
@@ -300,7 +300,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
       # baseline averages
       tas2 %>%
         dplyr::filter(year >= 1980,
-               year <= 2014) %>%
+               year <= 2010) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(baseTemp = mean(value)) %>%
         dplyr::ungroup() ->
@@ -308,7 +308,7 @@ calculate_deltas_from_climate <- function(climate_dir = NULL,
 
       pr2 %>%
         dplyr::filter(year >= 1980,
-               year <= 2014) %>%
+               year <= 2010) %>%
         dplyr::group_by(lon, lat, latgrid, longrid, crop, irr) %>%
         dplyr::summarise(basePr = mean(value)) %>%
         dplyr::ungroup() ->

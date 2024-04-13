@@ -51,7 +51,8 @@ grid_to_basin_yield <- function(carbon = NULL,
   # Initialize
   #.........................
 
-  rlang::inform("Starting grid_to_basin_yield...")
+  rlang::inform(paste0("Starting grid_to_basin_yield for ", cm_name, "_",
+                       esm_name, "_", scn_name, ": ", paste(crops, collapse = ", ")))
 
   # Check write dir
   if(!dir.exists(write_dir)){dir.create(write_dir)}
@@ -344,7 +345,8 @@ grid_to_basin_yield <- function(carbon = NULL,
                                  grepl("crop08", areafilelist)]
 
   # CO2
-  carbon <- utils::read.csv(paste0(carbon), stringsAsFactors = F)
+  carbon <- utils::read.csv(paste0(carbon), stringsAsFactors = F) %>%
+    dplyr::mutate(value = dplyr::if_else(value > 810, 810, value))
 
   #.........................
   # Maps
@@ -475,8 +477,10 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     # read in climate data
-    rf_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('rfd', inputlist)], stringsAsFactors = F)
-    ir_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('irr', inputlist)], stringsAsFactors = F)
+    rf_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('rfd', inputlist)], stringsAsFactors = F) %>%
+      dplyr::mutate(deltaP = dplyr::if_else(deltaP > 1.3, 1.3, deltaP))
+    ir_tp <- utils::read.csv(inputlist[grepl(tolower(crop), inputlist) & grepl('irr', inputlist)], stringsAsFactors = F) %>%
+      dplyr::mutate(deltaP = dplyr::if_else(deltaP > 1.3, 1.3, deltaP))
 
     # Combine C, N, T and P data with ir and rfd params to get ir, rf yields in each
     # grid cell in each year
@@ -657,13 +661,13 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
     # Check that ir and rf summed correctly
-    if(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE) == sum(ir_yield_wheat$yield, na.rm = TRUE)) {
-      rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield")
-    } else{rlang::inform("Error: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield")}
+    if(all.equal(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE), sum(ir_yield_wheat$yield, na.rm = TRUE))) {
+      rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield.")
+    } else{rlang::inform(paste0("Warning: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield. The difference is ", sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE) - sum(ir_yield_wheat$yield, na.rm = TRUE)))}
 
-    if(sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE) == sum(rf_yield_wheat$yield, na.rm = TRUE)) {
+    if(all.equal(sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE), sum(rf_yield_wheat$yield, na.rm = TRUE))) {
       rlang::inform("Sum of individual rainfed spring and winter wheat yields correctly sum to total rainfed wheat yield")
-    } else{rlang::inform("Error: Sum of individual rainfed spring and winter wheat yields do not sum to total rainfed wheat yield")}
+    } else{rlang::inform(paste0("Warning: Sum of individual rainfed spring and winter wheat yields do not sum to total rainfed wheat yield. The difference is ", sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE) - sum(rf_yield_wheat$yield, na.rm = TRUE)))}
 
 
     # Generate basin yield
