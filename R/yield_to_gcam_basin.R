@@ -379,8 +379,8 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
 
 
   # write
-  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/ag_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
-  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/bio_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",2*rolling_avg_years +1, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/ag_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",rolling_avg_years, "_gridcull_allyroutlier.csv"), row.names=FALSE)
+  utils::write.csv(bio_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1, paste0(write_dir, "/bio_impacts_", esm_name, "_", scn_name, "_rcp_gcm_gcm_R_GLU_C_IRR_allyears_RA",rolling_avg_years, "_gridcull_allyroutlier.csv"), row.names=FALSE)
 
 
   rlang::inform("yield_to_gcam_basin complete.")
