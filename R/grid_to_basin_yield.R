@@ -623,10 +623,6 @@ grid_to_basin_yield <- function(carbon = NULL,
     # Read in spring/winter wheat area masks so that we can the area weighted yield for
     # winter/spring wheat to get total production by grid cell, then dividing that by
     # the MIRCA harvested area to get yield again.
-    wheat_area <- 'data/inputs/winter_and_spring_wheat_areas_v1_180627.nc4' # sourced from https://gmd.copernicus.org/articles/13/2315/2020/#section6 and
-    # downloaded from https://zenodo.org/records/3773827
-
-
     ncin <- ncdf4::nc_open(wheat_area)
 
     nc_lon <- ncdf4::ncvar_get(ncin,'lon')
