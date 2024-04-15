@@ -4,7 +4,7 @@
 #' gcam basin level via MIRCA harvested areas.
 #'
 #' @param carbon Default = NULL
-#' @param weight_floor_ha Default = 1
+#' @param weight_floor_ha Default = 100 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units
 #' @param emulator_dir Default = NULL
 #' @param input_dir Default = NULL
 #' @param area_dir Default = NULL
@@ -13,6 +13,7 @@
 #' @param region_id Default = NULL. Filters to specified GCAM region (1-32), otherwise no filter
 #' @param gridded_yield_dir Default = NULL.
 #' @param write_dir Default = "step2_grid_to_basin_yield". Output Folder
+#' @param wheat_area = NULL
 #' @param crops Default = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat")
 #' @param esm_name Default = 'WRF'
 #' @param cm_name Default = 'LPJmL'
@@ -30,7 +31,7 @@
 #' }
 
 grid_to_basin_yield <- function(carbon = NULL,
-                                weight_floor_ha = 1,
+                                weight_floor_ha = 100,
                                 emulator_dir = NULL,
                                 input_dir = NULL,
                                 area_dir = NULL,
@@ -39,6 +40,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                                 region_id = NULL,
                                 gridded_yield_dir = NULL,
                                 write_dir = "step2_grid_to_basin_yield",
+                                wheat_area = NULL,
                                 crops = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat"),
                                 esm_name = 'WRF',
                                 cm_name = 'LPJmL',
@@ -618,63 +620,191 @@ grid_to_basin_yield <- function(carbon = NULL,
     crop <- "Wheat"
     rlang::inform(paste0("Generating basin yield for ", crop))
 
+    # Read in spring/winter wheat area masks so that we can the area weighted yield for
+    # winter/spring wheat to get total production by grid cell, then dividing that by
+    # the MIRCA harvested area to get yield again.
+    wheat_area <- 'data/inputs/winter_and_spring_wheat_areas_v1_180627.nc4' # sourced from https://gmd.copernicus.org/articles/13/2315/2020/#section6 and
+    # downloaded from https://zenodo.org/records/3773827
+
+
+    ncin <- ncdf4::nc_open(wheat_area)
+
+    nc_lon <- ncdf4::ncvar_get(ncin,'lon')
+    nc_lat <- ncdf4::ncvar_get(ncin, 'lat')
+    grid <- expand.grid(list(lon=nc_lon,lat=nc_lat))
+
+    units <- unique(c(ncin$var$wwh_rf_area$units,
+                      ncin$var$wwh_ir_area$units,
+                      ncin$var$swh_rf_area$units,
+                      ncin$var$swh_ir_area$units))
+    if (length(units) >1){
+      print(paste('something is wrong with', wheat_area, '; too many units'))
+    }
+
+    print(c(ncin$var$wwh_rf_area$longname,
+            ncin$var$wwh_ir_area$longname,
+            ncin$var$swh_rf_area$longname,
+            ncin$var$swh_ir_area$longname))
+
+    wheat_areas_holder <- data.frame()
+    for (varname in c('wwh_rf_area', 'wwh_ir_area', 'swh_rf_area', 'swh_ir_area')){
+      areadata <- ncdf4::ncvar_get(ncin, varname)
+      indlon <- which(dim(areadata)==length(nc_lon))
+      indlat <- which(dim(areadata)==length(nc_lat))
+
+      area_long <-matrix(aperm(areadata, c(indlon,indlat)),
+                         length(nc_lat)*length(nc_lon))
+
+
+      area_vals <-cbind(grid, area_long) %>%
+        rename(HA = area_long) %>%
+        na.omit %>%
+        mutate(varname = varname) %>%
+        separate(varname, into = c('crop', 'irr', 'area'), sep = '_') %>%
+        mutate(crop = if_else(crop == 'wwh', 'Winter Wheat', 'Spring Wheat'),
+               irr = if_else(irr == 'ir', 'IRR', 'RFD')) %>%
+        select(-area)
+
+
+      area_vals %>%
+        bind_rows(wheat_areas_holder, .) ->
+        wheat_areas_holder
+    }
+    ncdf4::nc_close(ncin)
+    rm(areadata)
+    rm(area_long)
+    rm(area_vals)
+    rm(grid)
+    rm(nc_lon)
+    rm(nc_lat)
+    rm(indlon)
+    rm(indlat)
+
+
+    #QC: Compare to MIRCA total
+    # Not sure need to bring over to OSIRIS
+    # MIRCA2000 has irr and rfd harvested area values for 'wheat'. If the total
+    # across winter and spring wheat areas for each of irr, rfd in the agmip
+    # netcdf agrees with the MIRCA total to at least one decimal place, happy with that.
+    wheat_areas_holder %>%
+      group_by(lon, lat, irr) %>%
+      summarise(HA = sum(HA, na.rm = T)) %>%
+      ungroup ->
+      wheat_total_areas_byirr
+
+    area.grid.Wheat.ir %>%
+      left_join(wheat_total_areas_byirr %>% filter(irr == 'IRR') %>%
+                  rename(newHA = HA), by = c('lon', 'lat')) %>%
+      filter(HA > 0 ) ->
+      irr_compare
+    print(paste('winter/spring wheat irr HA processed correctly if following is 0:',
+                length(which(abs(irr_compare$HA - irr_compare$newHA) > 1e-1)) ))
+
+    area.grid.Wheat.rf %>%
+      left_join(wheat_total_areas_byirr %>% filter(irr == 'RFD') %>%
+                  rename(newHA = HA), by = c('lon', 'lat')) %>%
+      filter(HA > 0 ) ->
+      rfd_compare
+    print(paste('winter/spring wheat rfd HA processed correctly if following is 0:',
+                length(which(abs(rfd_compare$HA - rfd_compare$newHA) > 1e-1)) ) )
+
+    # Using winter/spring Wheat HA's to get to basin level yields from gridded.
+
     griddedlist <- list.files(path=gridded_yield_dir, pattern = paste0(esm_name, "_", scn_name), full.names=TRUE, recursive=FALSE)
 
     # Read in spring and winter wheat gridded yield outputs
-    ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F) %>%
+    ir_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('irr', griddedlist)],
+                                       stringsAsFactors = F) %>%
       dplyr::select(-c(deltaT, deltaP)) %>%
       dplyr::rename(swheat_yield = yield) %>%
-      dplyr::mutate(crop = "Wheat")
+      dplyr::left_join(wheat_areas_holder,
+                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      tidyr::replace_na(list(HA = 0)) %>%
+      dplyr::rename(swheat_HA = HA) %>%
+      dplyr::mutate(swheat_prod = swheat_yield * swheat_HA) %>%
+      dplyr::select(-swheat_yield)
+
+
     rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr::rename(swheat_yield = yield) %>%
-      dplyr::mutate(crop = "Wheat")
+      dplyr::rename(swheat_yield = yield)  %>%
+      dplyr::left_join(wheat_areas_holder,
+                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      tidyr::replace_na(list(HA = 0)) %>%
+      dplyr::rename(swheat_HA = HA) %>%
+      dplyr::mutate(swheat_prod = swheat_yield * swheat_HA) %>%
+      dplyr::select(-swheat_yield)
 
     ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr::rename(wwheat_yield = yield) %>%
-      dplyr::mutate(crop = "Wheat")
+      dplyr::rename(wwheat_yield = yield)  %>%
+      dplyr::left_join(wheat_areas_holder,
+                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      tidyr::replace_na(list(HA = 0)) %>%
+      dplyr::rename(wwheat_HA = HA) %>%
+      dplyr::mutate(wwheat_prod = wwheat_yield * wwheat_HA) %>%
+      dplyr::select(-wwheat_yield)
+
     rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
-      dplyr::rename(wwheat_yield = yield) %>%
-      dplyr::mutate(crop = "Wheat")
+      dplyr::rename(wwheat_yield = yield)  %>%
+      dplyr::left_join(wheat_areas_holder,
+                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      tidyr::replace_na(list(HA = 0))%>%
+      dplyr::rename(wwheat_HA = HA) %>%
+      dplyr::mutate(wwheat_prod = wwheat_yield * wwheat_HA) %>%
+      dplyr::select(-wwheat_yield)
+
+    # Combine spring and winter wheat yields in each grid cell for each year using
+    # HA weights:
+    ir_yield_swheat %>%
+      dplyr::select(-crop) %>%
+      dplyr::full_join(ir_yield_wwheat  %>% dplyr::select(-crop),
+                       by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      tidyr::replace_na(list(swheat_HA = 0, swheat_prod=0, wwheat_HA = 0, wwheat_prod = 0)) %>%
+      group_by(gcm, cropmodel, irr, lon, lat, year) %>%
+      summarize(total_prod = swheat_prod + wwheat_prod,
+                total_HA = swheat_HA + wwheat_HA) %>%
+      ungroup  %>%
+      mutate(yield = if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
+      mutate(crop = 'Wheat') ->
+      ir_yield_wheat
 
 
-    # Function for adding rows with NA (we want to keep NA if summing two NA, otherwise
-    # summing two NA will yield 0)
-    sum_na <- function(x) {
-      if(all(is.na(x))) NA else sum(x, na.rm = TRUE)
-    }
-
-    ir_yield_wheat <- dplyr::full_join(ir_yield_swheat,
-                                       ir_yield_wwheat,
-                                       by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
-
-
-    rf_yield_wheat <- dplyr::full_join(rf_yield_swheat,
-                                       rf_yield_wwheat,
-                                       by = c("crop", "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(yield = sum_na(c(swheat_yield, wwheat_yield)))
-
+    rf_yield_swheat %>%
+      dplyr::select(-crop) %>%
+      dplyr::full_join(rf_yield_wwheat  %>% dplyr::select(-crop),
+                       by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      tidyr::replace_na(list(swheat_HA = 0, swheat_prod=0, wwheat_HA = 0, wwheat_prod = 0)) ->
+      x
+    x%>%
+      group_by(gcm, cropmodel, irr, lon, lat, year) %>%
+      summarize(total_prod = swheat_prod + wwheat_prod,
+                total_HA = swheat_HA + wwheat_HA) %>%
+      ungroup  %>%
+      mutate(yield = if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
+      mutate(crop = 'Wheat') ->
+      rf_yield_wheat
 
     # Check that ir and rf summed correctly
-    if(all.equal(sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE), sum(ir_yield_wheat$yield, na.rm = TRUE))) {
-      rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield.")
-    } else{rlang::inform(paste0("Warning: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield. The difference is ", sum(ir_yield_swheat$swheat_yield, ir_yield_wwheat$wwheat_yield, na.rm = TRUE) - sum(ir_yield_wheat$yield, na.rm = TRUE)))}
+    # Honestly if they agree to like first decimal place (1e-1), that's probably fine
+    if(abs(sum(ir_yield_swheat$swheat_HA, ir_yield_wwheat$wwheat_HA, na.rm = TRUE) - sum(ir_yield_wheat$total_HA, na.rm = TRUE)) < 1e-3 &
+       abs(sum(ir_yield_swheat$swheat_prod, ir_yield_wwheat$wwheat_prod, na.rm = TRUE) - sum(ir_yield_wheat$total_prod, na.rm = TRUE)) < 1e-3) {
+      rlang::inform("Sum of individual irrigated spring and winter wheat yields correctly sum to total irrigated wheat yield")
+    } else{rlang::inform("Error: Sum of individual irrigated spring and winter wheat yields do not sum to total irrigated wheat yield")}
 
-    if(all.equal(sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE), sum(rf_yield_wheat$yield, na.rm = TRUE))) {
+    if(abs(sum(rf_yield_swheat$swheat_HA, rf_yield_wwheat$wwheat_HA, na.rm = TRUE) - sum(rf_yield_wheat$total_HA, na.rm = TRUE)) < 1e-3 &
+       abs(sum(rf_yield_swheat$swheat_prod, rf_yield_wwheat$wwheat_prod, na.rm = TRUE) - sum(rf_yield_wheat$total_prod, na.rm = TRUE)) < 1e-3) {
       rlang::inform("Sum of individual rainfed spring and winter wheat yields correctly sum to total rainfed wheat yield")
-    } else{rlang::inform(paste0("Warning: Sum of individual rainfed spring and winter wheat yields do not sum to total rainfed wheat yield. The difference is ", sum(rf_yield_swheat$swheat_yield, rf_yield_wwheat$wwheat_yield, na.rm = TRUE) - sum(rf_yield_wheat$yield, na.rm = TRUE)))}
+    } else{rlang::inform("Error: Sum of individual rainfed spring and winter wheat yields do not sum to total rainfed wheat yield")}
+
 
 
     # Generate basin yield
     ir_yields_basin  <- aggregate_halfdeg_yield2basin(ir_yield_wheat %>%
-                                                        dplyr::select(-c(swheat_yield, wwheat_yield)))
+                                                        dplyr::select(-c(total_prod, total_HA)))
     rf_yields_basin  <- aggregate_halfdeg_yield2basin(rf_yield_wheat %>%
-                                                        dplyr::select(-c(swheat_yield, wwheat_yield)))
+                                                        dplyr::select(-c(total_prod, total_HA)))
 
     dplyr::bind_rows(rf_yields_basin,
                      ir_yields_basin) ->

@@ -6,7 +6,7 @@
 \usage{
 grid_to_basin_yield(
   carbon = NULL,
-  weight_floor_ha = 1,
+  weight_floor_ha = 100,
   emulator_dir = NULL,
   input_dir = NULL,
   area_dir = NULL,
@@ -15,6 +15,7 @@ grid_to_basin_yield(
   region_id = NULL,
   gridded_yield_dir = NULL,
   write_dir = "step2_grid_to_basin_yield",
+  wheat_area = NULL,
   crops = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat"),
   esm_name = "WRF",
   cm_name = "LPJmL",
@@ -25,7 +26,7 @@ grid_to_basin_yield(
 \arguments{
 \item{carbon}{Default = NULL}
 
-\item{weight_floor_ha}{Default = 1}
+\item{weight_floor_ha}{Default = 100 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units}
 
 \item{emulator_dir}{Default = NULL}
 
@@ -42,6 +43,8 @@ grid_to_basin_yield(
 \item{gridded_yield_dir}{Default = NULL.}
 
 \item{write_dir}{Default = "step2_grid_to_basin_yield". Output Folder}
+
+\item{wheat_area}{= NULL}
 
 \item{crops}{Default = c("Corn", "Rice", "Soy", "Spring Wheat", "Winter Wheat")}
 

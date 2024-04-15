@@ -5,18 +5,17 @@
 \title{yield_to_gcam_basin}
 \usage{
 yield_to_gcam_basin(
-  write_dir = "outputs_yield_to_gcam_basin",
+  write_dir = "step3_yield_to_gcam_basin",
   emulated_basin_yield_dir = NULL,
   iso_GCAM_region_mapping = NULL,
   FAO_ag_mapping = NULL,
   iso_harvest_area_mapping = NULL,
   iso_GCAM_basin_mapping = NULL,
   esm_name = "WRF",
-  scn_name = "rcp8p5_hot",
+  scn_name = "rcp8p5_hotter",
   max_CCImult = 2.5,
   min_CCImult = 0.01,
-  weight_floor_ha = 1,
-  rolling_avg_years = 15,
+  rolling_avg_years = 5,
   maxHistYear = 2010,
   minFutYear = 2015,
   maxFutYear = 2100,
@@ -24,7 +23,7 @@ yield_to_gcam_basin(
 )
 }
 \arguments{
-\item{write_dir}{Default = "outputs_yield_to_gcam_basin". Output Folder}
+\item{write_dir}{Default = "step3_yield_to_gcam_basin". Output Folder}
 
 \item{emulated_basin_yield_dir}{Default = NULL}
 
@@ -38,15 +37,13 @@ yield_to_gcam_basin(
 
 \item{esm_name}{Default = 'WRF'}
 
-\item{scn_name}{Default = 'rcp8p5_hot'}
+\item{scn_name}{Default = 'rcp8p5_hotter'}
 
 \item{max_CCImult}{Default = 2.5 Upper limit on positive climate impacts (multiplier)}
 
 \item{min_CCImult}{Default = 0.01 Lower limit on negative climate impacts (multiplier)}
 
-\item{weight_floor_ha}{Default = 1 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units.}
-
-\item{rolling_avg_years}{Default = 15 Set the number of years to define the range for rolling averages (range = 2 times this plus 1)}
+\item{rolling_avg_years}{Default = 5 Set the number of years to define the range for rolling averages}
 
 \item{maxHistYear}{Default = 2010 Historical year for which to apply rolling averages}
 

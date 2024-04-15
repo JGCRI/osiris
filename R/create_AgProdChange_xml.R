@@ -3,9 +3,9 @@
 #' Function that takes the defined impacts and reference AgProdChange files then
 #' updates and saves the new AgProdChange csv and xml files.
 #'
-#' @param write_dir Default = "outputs_create_AgProdChange_xml". Output Folder
+#' @param write_dir Default = "step4_create_AgProdChange_xml". Output Folder
 #' @param esm_name Default = 'WRF'
-#' @param scn_name Default = 'rcp8p5_hot'
+#' @param scn_name Default = 'rcp8p5_hotter'
 #' @param ssp Default = 'ssp3'
 #' @param ag_irr_ref Default = NULL
 #' @param bio_irr_ref Default = NULL
@@ -29,9 +29,9 @@
 #' osiris::create_AgProdChange_xml()
 #' }
 
-create_AgProdChange_xml <- function(write_dir = "outputs_create_AgProdChange_xml",
+create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
                                     esm_name = 'WRF',
-                                    scn_name = 'rcp8p5_hot',
+                                    scn_name = 'rcp8p5_hotter',
                                     ssp = 'ssp3',
                                     ag_irr_ref = NULL,
                                     bio_irr_ref = NULL,

@@ -3,18 +3,17 @@
 #' Function that uses emulated yield data aggregated to GCAM basin level to create
 #' GCAM region, basin, and irrigation level data for all GCAM commodities
 #'
-#' @param write_dir Default = "outputs_yield_to_gcam_basin". Output Folder
+#' @param write_dir Default = "step3_yield_to_gcam_basin". Output Folder
 #' @param emulated_basin_yield_dir Default = NULL
 #' @param iso_GCAM_region_mapping Default = NULL
 #' @param FAO_ag_mapping Default = NULL
 #' @param iso_harvest_area_mapping Default = NULL
 #' @param iso_GCAM_basin_mapping Default = NULL
 #' @param esm_name Default = 'WRF'
-#' @param scn_name Default = 'rcp8p5_hot'
+#' @param scn_name Default = 'rcp8p5_hotter'
 #' @param max_CCImult Default = 2.5 Upper limit on positive climate impacts (multiplier)
 #' @param min_CCImult Default = 0.01 Lower limit on negative climate impacts (multiplier)
-#' @param weight_floor_ha Default = 1 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units.
-#' @param rolling_avg_years Default = 15 Set the number of years to define the range for rolling averages (range = 2 times this plus 1)
+#' @param rolling_avg_years Default = 5 Set the number of years to define the range for rolling averages
 #' @param maxHistYear Default = 2010 Historical year for which to apply rolling averages
 #' @param minFutYear Default = 2015 Min future year for which to apply rolling averages
 #' @param maxFutYear Default = 2100 Max future year for which to apply rolling averages
@@ -30,18 +29,17 @@
 #' osiris::yield_to_gcam_basin()
 #' }
 
-yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
+yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
                                 emulated_basin_yield_dir = NULL,
                                 iso_GCAM_region_mapping = NULL,
                                 FAO_ag_mapping = NULL,
                                 iso_harvest_area_mapping = NULL,
                                 iso_GCAM_basin_mapping = NULL,
                                 esm_name = "WRF",
-                                scn_name = "rcp8p5_hot",
+                                scn_name = "rcp8p5_hotter",
                                 max_CCImult = 2.5,
                                 min_CCImult = 0.01,
-                                weight_floor_ha = 1,
-                                rolling_avg_years = 15,
+                                rolling_avg_years = 5,
                                 maxHistYear = 2010,
                                 minFutYear = 2015,
                                 maxFutYear = 2100,
@@ -72,16 +70,9 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   # Custom functions
   #.........................
 
-  rollAvg <-  function(x,n){
-    y <- stats::filter(x,rep(1/n,n), sides=2)
-    ind <- which(is.na(y))
-
-    for(i in 1:length(ind)){
-      left <- max(1,ind[i] - (n-1) /2)
-      right <- min( max(ind), ind[i] + (n-1) /2)
-      y[ind[i]] <- mean(x[left:right])
-    }
-
+  # Backward rolling average
+  rollAvg <-  function(x, n){
+    y <- stats::filter(x, rep(1/n, n), sides=1)
     y
   }
 
@@ -226,8 +217,8 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
 
   # get base average for each unique ID from historical years
   emu_yield_HA_AllYears_glu_irr_isicrop %>%
-    dplyr::filter(year <= (maxHistYear + rolling_avg_years),
-                  year >= (maxHistYear - rolling_avg_years)) %>%
+    dplyr::filter(year <= 2010,
+                  year >= 1980) %>%
     dplyr::group_by(ID, weight,rcp, gcm, cropmodel,crop, irr) %>%
     dplyr::mutate(base = mean(yield)) %>%
     dplyr::ungroup() %>%
@@ -241,7 +232,7 @@ yield_to_gcam_basin <- function(write_dir = "outputs_yield_to_gcam_basin",
   emu_yield_HA_AllYears_glu_irr_isicrop %>%
     dplyr::filter(year > maxHistYear) %>%
     dplyr::group_by(ID, weight,rcp, gcm, cropmodel,crop, irr) %>%
-    dplyr::mutate(yield = as.numeric(rollAvg(yield, n= (2*rolling_avg_years+1) ) ) ) %>%
+    dplyr::mutate(yield = as.numeric(rollAvg(yield, n = rolling_avg_years ) ) ) %>%
     dplyr::ungroup() %>%
     # append base values
     dplyr::left_join(emu_yield_HA_base_glu_irr_isicrop,
