@@ -95,7 +95,7 @@ gcam basin level via MIRCA harvested areas.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">grid_to_basin_yield</span><span class="op">(</span></span>
 <span>  carbon <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  weight_floor_ha <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  weight_floor_ha <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  emulator_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  input_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  area_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -104,6 +104,7 @@ gcam basin level via MIRCA harvested areas.</p>
 <span>  region_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gridded_yield_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  write_dir <span class="op">=</span> <span class="st">"step2_grid_to_basin_yield"</span>,</span>
+<span>  wheat_area <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  crops <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Corn"</span>, <span class="st">"Rice"</span>, <span class="st">"Soy"</span>, <span class="st">"Spring Wheat"</span>, <span class="st">"Winter Wheat"</span><span class="op">)</span>,</span>
 <span>  esm_name <span class="op">=</span> <span class="st">"WRF"</span>,</span>
 <span>  cm_name <span class="op">=</span> <span class="st">"LPJmL"</span>,</span>
@@ -119,7 +120,7 @@ gcam basin level via MIRCA harvested areas.</p>
 
 
 <dt>weight_floor_ha</dt>
-<dd><p>Default = 1</p></dd>
+<dd><p>Default = 100 Floor on area weights, in hectares. Below this climate impacts will be ignored. These are more likely than others to be problematic. 1 hectare = 0.01 km^2  = 1e-5 thou km^2, GCAM land units</p></dd>
 
 
 <dt>emulator_dir</dt>
@@ -152,6 +153,10 @@ gcam basin level via MIRCA harvested areas.</p>
 
 <dt>write_dir</dt>
 <dd><p>Default = "step2_grid_to_basin_yield". Output Folder</p></dd>
+
+
+<dt>wheat_area</dt>
+<dd><p>= NULL</p></dd>
 
 
 <dt>crops</dt>
