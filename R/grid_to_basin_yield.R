@@ -656,9 +656,9 @@ grid_to_basin_yield <- function(carbon = NULL,
         rename(HA = area_long) %>%
         na.omit %>%
         mutate(varname = varname) %>%
-        separate(varname, into = c('crop', 'irr', 'area'), sep = '_') %>%
-        mutate(crop = if_else(crop == 'wwh', 'Winter Wheat', 'Spring Wheat'),
-               irr = if_else(irr == 'ir', 'IRR', 'RFD')) %>%
+        tidyr::separate(varname, into = c('crop', 'irr', 'area'), sep = '_') %>%
+        mutate(crop = dplyr::if_else(crop == 'wwh', 'Winter Wheat', 'Spring Wheat'),
+               irr = dplyr::if_else(irr == 'ir', 'IRR', 'RFD')) %>%
         select(-area)
 
 
@@ -683,23 +683,25 @@ grid_to_basin_yield <- function(carbon = NULL,
     # across winter and spring wheat areas for each of irr, rfd in the agmip
     # netcdf agrees with the MIRCA total to at least one decimal place, happy with that.
     wheat_areas_holder %>%
-      group_by(lon, lat, irr) %>%
-      summarise(HA = sum(HA, na.rm = T)) %>%
-      ungroup ->
+      dplyr::group_by(lon, lat, irr) %>%
+      dplyr::summarise(HA = sum(HA, na.rm = T)) %>%
+      dplyr::ungroup ->
       wheat_total_areas_byirr
 
     area.grid.Wheat.ir %>%
-      left_join(wheat_total_areas_byirr %>% filter(irr == 'IRR') %>%
-                  rename(newHA = HA), by = c('lon', 'lat')) %>%
-      filter(HA > 0 ) ->
+      dplyr::left_join(wheat_total_areas_byirr %>%
+                         dplyr::filter(irr == 'IRR') %>%
+                         dplyr::rename(newHA = HA), by = c('lon', 'lat')) %>%
+      dplyr::filter(HA > 0 ) ->
       irr_compare
     print(paste('winter/spring wheat irr HA processed correctly if following is 0:',
                 length(which(abs(irr_compare$HA - irr_compare$newHA) > 1e-1)) ))
 
     area.grid.Wheat.rf %>%
-      left_join(wheat_total_areas_byirr %>% filter(irr == 'RFD') %>%
-                  rename(newHA = HA), by = c('lon', 'lat')) %>%
-      filter(HA > 0 ) ->
+      dplyr::left_join(wheat_total_areas_byirr %>%
+                         dplyr::filter(irr == 'RFD') %>%
+                         dplyr::rename(newHA = HA), by = c('lon', 'lat')) %>%
+      dplyr::filter(HA > 0 ) ->
       rfd_compare
     print(paste('winter/spring wheat rfd HA processed correctly if following is 0:',
                 length(which(abs(rfd_compare$HA - rfd_compare$newHA) > 1e-1)) ) )
@@ -713,8 +715,7 @@ grid_to_basin_yield <- function(carbon = NULL,
                                        stringsAsFactors = F) %>%
       dplyr::select(-c(deltaT, deltaP)) %>%
       dplyr::rename(swheat_yield = yield) %>%
-      dplyr::left_join(wheat_areas_holder,
-                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      dplyr::left_join(wheat_areas_holder, by = c('crop', 'irr', 'lon', 'lat')) %>%
       tidyr::replace_na(list(HA = 0)) %>%
       dplyr::rename(swheat_HA = HA) %>%
       dplyr::mutate(swheat_prod = swheat_yield * swheat_HA) %>%
@@ -724,8 +725,7 @@ grid_to_basin_yield <- function(carbon = NULL,
     rf_yield_swheat <- utils::read.csv(griddedlist[grepl('spring wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
       dplyr::rename(swheat_yield = yield)  %>%
-      dplyr::left_join(wheat_areas_holder,
-                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      dplyr::left_join(wheat_areas_holder, by = c('crop', 'irr', 'lon', 'lat')) %>%
       tidyr::replace_na(list(HA = 0)) %>%
       dplyr::rename(swheat_HA = HA) %>%
       dplyr::mutate(swheat_prod = swheat_yield * swheat_HA) %>%
@@ -734,8 +734,7 @@ grid_to_basin_yield <- function(carbon = NULL,
     ir_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('irr', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
       dplyr::rename(wwheat_yield = yield)  %>%
-      dplyr::left_join(wheat_areas_holder,
-                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      dplyr::left_join(wheat_areas_holder, by = c('crop', 'irr', 'lon', 'lat')) %>%
       tidyr::replace_na(list(HA = 0)) %>%
       dplyr::rename(wwheat_HA = HA) %>%
       dplyr::mutate(wwheat_prod = wwheat_yield * wwheat_HA) %>%
@@ -744,8 +743,7 @@ grid_to_basin_yield <- function(carbon = NULL,
     rf_yield_wwheat <- utils::read.csv(griddedlist[grepl('winter wheat', griddedlist) & grepl('rfd', griddedlist)], stringsAsFactors = F)%>%
       dplyr::select(-c(deltaT, deltaP)) %>%
       dplyr::rename(wwheat_yield = yield)  %>%
-      dplyr::left_join(wheat_areas_holder,
-                       by = c('crop', 'irr', 'lon', 'lat')) %>%
+      dplyr::left_join(wheat_areas_holder, by = c('crop', 'irr', 'lon', 'lat')) %>%
       tidyr::replace_na(list(HA = 0))%>%
       dplyr::rename(wwheat_HA = HA) %>%
       dplyr::mutate(wwheat_prod = wwheat_yield * wwheat_HA) %>%
@@ -755,31 +753,30 @@ grid_to_basin_yield <- function(carbon = NULL,
     # HA weights:
     ir_yield_swheat %>%
       dplyr::select(-crop) %>%
-      dplyr::full_join(ir_yield_wwheat  %>% dplyr::select(-crop),
-                       by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      dplyr::full_join(ir_yield_wwheat  %>% dplyr::select(-crop), by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
       tidyr::replace_na(list(swheat_HA = 0, swheat_prod=0, wwheat_HA = 0, wwheat_prod = 0)) %>%
-      group_by(gcm, cropmodel, irr, lon, lat, year) %>%
-      summarize(total_prod = swheat_prod + wwheat_prod,
-                total_HA = swheat_HA + wwheat_HA) %>%
-      ungroup  %>%
-      mutate(yield = if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
-      mutate(crop = 'Wheat') ->
+      dplyr::group_by(gcm, cropmodel, irr, lon, lat, year) %>%
+      dplyr::summarize(total_prod = swheat_prod + wwheat_prod,
+                       total_HA = swheat_HA + wwheat_HA) %>%
+      dplyr::ungroup  %>%
+      dplyr::mutate(yield = dplyr::if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
+      dplyr::mutate(crop = 'Wheat') ->
       ir_yield_wheat
 
 
     rf_yield_swheat %>%
       dplyr::select(-crop) %>%
-      dplyr::full_join(rf_yield_wwheat  %>% dplyr::select(-crop),
-                       by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
+      dplyr::full_join(rf_yield_wwheat %>%
+                         dplyr::select(-crop), by = c( "irr", "lon", "lat", "year", "gcm", "cropmodel")) %>%
       tidyr::replace_na(list(swheat_HA = 0, swheat_prod=0, wwheat_HA = 0, wwheat_prod = 0)) ->
       x
     x%>%
-      group_by(gcm, cropmodel, irr, lon, lat, year) %>%
-      summarize(total_prod = swheat_prod + wwheat_prod,
-                total_HA = swheat_HA + wwheat_HA) %>%
-      ungroup  %>%
-      mutate(yield = if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
-      mutate(crop = 'Wheat') ->
+      dplyr::group_by(gcm, cropmodel, irr, lon, lat, year) %>%
+      dplyr::summarize(total_prod = swheat_prod + wwheat_prod,
+                       total_HA = swheat_HA + wwheat_HA) %>%
+      dplyr::ungroup  %>%
+      dplyr::mutate(yield = dplyr::if_else(total_HA == 0, 0, total_prod/total_HA)) %>%
+      dplyr::mutate(crop = 'Wheat') ->
       rf_yield_wheat
 
     # Check that ir and rf summed correctly

@@ -113,13 +113,13 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
   # correct abbreviations
   FAO_ag_items_PRODSTAT %>%
     dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::select(GTAP_crop, GCAM_commodity, lpjml_crop, epic_crop, gepic_crop, image_crop, lpjguess_crop, pdssat_crop, pegasus_crop) ->
+    dplyr::select(GTAP_crop, GCAM_commodity, lpjml_crop) ->
     crops_gtap_gcam_allCMs
 
   FAO_ag_items_PRODSTAT %>%
     dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::select(AgMIPAbbrev, C3avg_incl) %>%
-    dplyr::rename(cropname = AgMIPAbbrev)->
+    dplyr::select(AgMIP_fullNames, C3avg_incl) %>%
+    dplyr::rename(cropname = AgMIP_fullNames)->
     crops_masterlist_c3avgincl
 
   # switch factors to characters for remaining inputs
@@ -329,8 +329,8 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
 
 
   # # If not removing outliers
-  # ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears ->
-  #   ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1
+  ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears ->
+    ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1
 
   # if removing outliers
   # identify outliers for ag:
@@ -344,11 +344,8 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
   ag_tmp %>%
     dplyr::filter(outlier == FALSE) %>%
     dplyr::group_by(rcp, gcm, cropmodel, GCAM_region_ID, GLU, GLU_name, GCAM_commodity, irr) %>%
-    dplyr::mutate(maxyr = max(year)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(year == maxyr) %>%
-    dplyr::select(-outlier, -year, -base) %>%
-    dplyr::rename(maximp = impact) ->
+    dplyr::summarize(maximp = max(impact)) %>%
+    dplyr::ungroup() ->
     ag_tmp1
 
   # Join that to the table of outliers, and replace the outlier years
@@ -356,7 +353,7 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
     dplyr::left_join(ag_tmp1, by = c("rcp", "gcm", "cropmodel", "GCAM_region_ID", "GLU", "GLU_name", "GCAM_commodity", "irr"))  %>%
     dplyr::mutate(impact = dplyr::if_else(outlier == TRUE, maximp, impact)) %>%
     dplyr::mutate(impact = dplyr::if_else(impact > max_CCImult, max_CCImult, impact)) %>%
-    dplyr::select(-outlier, -maxyr, -maximp) ->
+    dplyr::select(-outlier, -maximp) ->
     ag_impacts_rcp_gcm_gcm_R_GLU_C_IRR_allyears1
 
   rm(ag_tmp)

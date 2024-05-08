@@ -6,9 +6,9 @@
 \usage{
 create_AgProdChange_xml(
   write_dir = "step4_create_AgProdChange_xml",
-  esm_name = "WRF",
-  scn_name = "rcp8p5_hotter",
-  ssp = "ssp3",
+  esm_name = NULL,
+  scn_name = NULL,
+  ssp = NULL,
   ag_irr_ref = NULL,
   bio_irr_ref = NULL,
   ag_impacts = NULL,
@@ -23,11 +23,11 @@ create_AgProdChange_xml(
 \arguments{
 \item{write_dir}{Default = "step4_create_AgProdChange_xml". Output Folder}
 
-\item{esm_name}{Default = 'WRF'}
+\item{esm_name}{Default = NULL}
 
-\item{scn_name}{Default = 'rcp8p5_hotter'}
+\item{scn_name}{Default = NULL}
 
-\item{ssp}{Default = 'ssp3'}
+\item{ssp}{Default = NULL}
 
 \item{ag_irr_ref}{Default = NULL}
 

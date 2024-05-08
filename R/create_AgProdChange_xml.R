@@ -4,9 +4,9 @@
 #' updates and saves the new AgProdChange csv and xml files.
 #'
 #' @param write_dir Default = "step4_create_AgProdChange_xml". Output Folder
-#' @param esm_name Default = 'WRF'
-#' @param scn_name Default = 'rcp8p5_hotter'
-#' @param ssp Default = 'ssp3'
+#' @param esm_name Default = NULL
+#' @param scn_name Default = NULL
+#' @param ssp Default = NULL
 #' @param ag_irr_ref Default = NULL
 #' @param bio_irr_ref Default = NULL
 #' @param ag_impacts Default = NULL
@@ -30,9 +30,9 @@
 #' }
 
 create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
-                                    esm_name = 'WRF',
-                                    scn_name = 'rcp8p5_hotter',
-                                    ssp = 'ssp3',
+                                    esm_name = NULL,
+                                    scn_name = NULL,
+                                    ssp = NULL,
                                     ag_irr_ref = NULL,
                                     bio_irr_ref = NULL,
                                     ag_impacts = NULL,
@@ -219,15 +219,19 @@ create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
     L2052.ag_IRR_CCI
 
 
+  # If domestic (ie USA) then remove all other iso data.
+  # If international (ie non_USA) then remove USA data.
   if(appliedto == "domestic"){
     L2052.ag_IRR_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region == 'USA', impact, 1),
-                    previmpact = dplyr::if_else(region == 'USA', previmpact, 1)) ->
+      dplyr::mutate(impact = dplyr::if_else(region == 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region == 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.ag_IRR_CCI
   } else   if(appliedto == "international"){
     L2052.ag_IRR_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region != 'USA', impact, 1),
-                    previmpact = dplyr::if_else(region != 'USA', previmpact, 1)) ->
+      dplyr::mutate(impact = dplyr::if_else(region != 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region != 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.ag_IRR_CCI
   }
 
@@ -260,13 +264,15 @@ create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
 
   if(appliedto == "domestic"){
     L2052.bio_IRR_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region == 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region == 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region == 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region == 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.bio_IRR_CCI
   } else if(appliedto == "international"){
     L2052.bio_IRR_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region != 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region != 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region != 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region != 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.bio_IRR_CCI
   }
 
@@ -300,13 +306,15 @@ create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
 
   if(appliedto == 'domestic'){
     L2052.ag_RFD_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region == 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region == 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region == 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region == 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.ag_RFD_CCI
   } else if(appliedto == 'international'){
     L2052.ag_RFD_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region != 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region != 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region != 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region != 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.ag_RFD_CCI
   }
 
@@ -338,13 +346,15 @@ create_AgProdChange_xml <- function(write_dir = "step4_create_AgProdChange_xml",
 
   if(appliedto == "domestic"){
     L2052.bio_RFD_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region == 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region == 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region == 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region == 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.bio_RFD_CCI
   } else if(appliedto == "international"){
     L2052.bio_RFD_CCI %>%
-      dplyr::mutate(impact = dplyr::if_else(region != 'USA', 1, impact),
-                    previmpact = dplyr::if_else(region != 'USA', 1, previmpact)) ->
+      dplyr::mutate(impact = dplyr::if_else(region != 'USA', impact, NA_real_),
+                    previmpact = dplyr::if_else(region != 'USA', previmpact, NA_real_)) %>%
+      stats::na.omit() ->
       L2052.bio_RFD_CCI
   }
 
