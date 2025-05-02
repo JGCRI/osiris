@@ -71,7 +71,9 @@ grid_to_basin_yield <- function(carbon = NULL,
     lon -> lat -> latgrid -> longrid -> crop -> irr -> deltaT -> deltaP ->
     crop_lon -> crop_lat -> C -> yield -> gcm -> cropmodel -> HA -> param_sum ->
     orig_lon -> coarse_lon -> coarse_lat -> id -> swh_ir -> wwh_ir -> swh_rf ->
-    wwh_rf -> .
+    wwh_rf -> area.grid.Wheat.ir -> area.grid.Wheat.rf -> swheat_yield ->
+    swheat_HA -> wwheat_yield -> wwheat_HA -> swheat_prod -> wwheat_prod ->
+    total_HA -> total_prod ->.
 
   # Check that the crops in the input argument are valid
   crops <- unique(crops)
@@ -653,17 +655,17 @@ grid_to_basin_yield <- function(carbon = NULL,
 
 
       area_vals <-cbind(grid, area_long) %>%
-        rename(HA = area_long) %>%
-        na.omit %>%
-        mutate(varname = varname) %>%
+        dplyr::rename(HA = area_long) %>%
+        stats::na.omit %>%
+        dplyr::mutate(varname = varname) %>%
         tidyr::separate(varname, into = c('crop', 'irr', 'area'), sep = '_') %>%
-        mutate(crop = dplyr::if_else(crop == 'wwh', 'Winter Wheat', 'Spring Wheat'),
-               irr = dplyr::if_else(irr == 'ir', 'IRR', 'RFD')) %>%
-        select(-area)
+        dplyr::mutate(crop = dplyr::if_else(crop == 'wwh', 'Winter Wheat', 'Spring Wheat'),
+                      irr = dplyr::if_else(irr == 'ir', 'IRR', 'RFD')) %>%
+        dplyr::select(-area)
 
 
       area_vals %>%
-        bind_rows(wheat_areas_holder, .) ->
+        dplyr::bind_rows(wheat_areas_holder, .) ->
         wheat_areas_holder
     }
     ncdf4::nc_close(ncin)

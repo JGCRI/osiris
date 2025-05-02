@@ -63,7 +63,7 @@ yield_to_gcam_basin <- function(write_dir = "step3_yield_to_gcam_basin",
     iso -> lpjguess_crop -> lpjml_crop -> maximp -> maxyr -> median -> outlier ->
     pdssat_crop -> pegasus_crop -> rcp -> weight -> GCAM_basin_ID -> GLU_code ->
     GLU_name -> HA -> ID -> ISO -> crop -> cropmodel -> gcm -> id -> irr ->
-    value -> year -> yield -> .
+    value -> year -> yield -> AgMIP_fullNames ->.
 
 
   #.........................

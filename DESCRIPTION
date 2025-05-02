@@ -1,19 +1,21 @@
 Package: osiris
 Title: Process climate impacts on agricultural yields for GCAM
-Version: 1.0.0
-Authors@R: c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
+Version: 1.0.3
+Authors@R: 
+    c(person("Zarrar", "Khan", email = "zarrar.khan@pnnl.gov", role = c("aut", "cre"),
 		   comment = c(ORCID ="0000-0002-8147-8553")),
 		   person("Abigail", "Snyder", role = c("aut"), comment = c(ORCID="0000-0002-9034-9948")),
 		   person("Hamza", "Ahsan", role = c("aut"), comment = c(ORCID="0000-0003-1631-1789")),
 		   person("Page", "Kyle", role = c("aut"), comment = c(ORCID="0000-0002-1257-8358")),
 		   person("Chris", "Vernon", role = c("aut"), comment = c(ORCID="0000-0002-3406-6214")))
-Description: Process climate impacts on agricultural yields for GCAM.
+Description: Osiris is an R package that is used to process climate impacts on agricultural yields for the Global Change Analysis Model (GCAM). This package is a modular data pipeline that consists of four steps that take gridded crop yield data from existing emulators and transforms them into agricultural yield impacts for GCAM commodities.
 URL: https://github.com/JGCRI/osiris
 BugReports: https://github.com/JGCRI/osiris/issues
 Depends: R (>= 2.10)
 License: BSD_2_clause + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
 	dplyr,
@@ -32,7 +34,8 @@ Imports:
 	purrr,
 	ggplot2,
 	stringi,
-	tidytable
+	tidytable,
+	stringr
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

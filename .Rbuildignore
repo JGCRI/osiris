@@ -36,3 +36,5 @@ cheatsheet.pdf
 ^cran-comments.md$
 ^csheet.pdf$
 ^.zenodo.json$
+^osiris\.Rproj$
+^Osiris_Data$
